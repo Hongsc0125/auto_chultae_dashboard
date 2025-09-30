@@ -9,10 +9,12 @@
   "scripts": {
     "dev": "vite",
     "build": "run-p type-check \"build-only {@}\" --",
-    "preview": "vite preview",
+    "preview": "vite preview --host --port 6500",
     "build-only": "vite build",
     "type-check": "vue-tsc --build",
-    "lint": "eslint . --fix"
+    "lint": "eslint . --fix",
+    "start": "npm run build && npm run preview",
+    "prod": "npm run build && npm run preview"
   },
   "dependencies": {
     "@radix-icons/vue": "^1.0.0",

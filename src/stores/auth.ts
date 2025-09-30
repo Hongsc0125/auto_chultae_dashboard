@@ -26,7 +26,7 @@ export const useAuthStore = defineStore('auth', () => {
 
   const login = async (username: string, password: string): Promise<boolean> => {
     try {
-      const response = await fetch('http://localhost:9000/api/web/auth/login', {
+      const response = await fetch('/api/web/auth/login', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -57,7 +57,7 @@ export const useAuthStore = defineStore('auth', () => {
 
   const register = async (username: string, password: string, email: string): Promise<boolean> => {
     try {
-      const response = await fetch('http://localhost:9000/api/web/auth/register', {
+      const response = await fetch('/api/web/auth/register', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -88,14 +88,16 @@ export const useAuthStore = defineStore('auth', () => {
     localStorage.removeItem('auth_user')
   }
 
-  const getAuthHeaders = () => {
+  const getAuthHeaders = (): Record<string, string> => {
     if (token.value) {
       return {
         'Authorization': `Bearer ${token.value}`,
         'Content-Type': 'application/json',
       }
     }
-    return {}
+    return {
+      'Content-Type': 'application/json',
+    }
   }
 
   return {
