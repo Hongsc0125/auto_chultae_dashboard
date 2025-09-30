@@ -829,34 +829,29 @@ const calculateStepDuration = (prevTime: string, currentTime: string) => {
 }
 
 const getExpectedSteps = () => {
-  if (!selectedLog.value) return 24
+  if (!selectedLog.value) return 30
 
   const actionType = selectedLog.value.action_type
   const status = selectedLog.value.status
+  const currentSteps = detailLogs.value.length
 
-  // 크롤링 로직 기반 정확한 단계 수 계산
+  // 완료된 프로세스인 경우, 실제 실행된 단계 수를 사용
+  if (status === 'success' || status === 'already_done' || status === 'failed') {
+    // 완료된 프로세스는 현재 단계 수가 실제 총 단계 수
+    return Math.max(currentSteps, 20) // 최소 20단계는 보장
+  }
+
+  // 진행중인 프로세스인 경우, 예상 단계 수 계산
   if (actionType === 'punch_in') {
-    // 출근 프로세스 기본 단계: 24단계
-    if (status === 'success') {
-      return 24  // 정상 완료: process_start → process_complete
-    } else if (status === 'already_done') {
-      return 20  // 이미 완료: 로그인 후 상태 확인까지만
-    } else {
-      return 30  // 실패/재시도: 추가 오류 처리 단계 포함
-    }
+    // 출근 프로세스: 평균 25-30단계
+    return 30  // 여유있게 설정
   } else if (actionType === 'punch_out') {
-    // 퇴근 프로세스: 출근 기본 단계 + 퇴근 상태 확인 단계
-    if (status === 'success') {
-      return 26  // 정상 완료: 기본 24단계 + 퇴근 상태 확인 2단계
-    } else if (status === 'already_done') {
-      return 25  // 이미 완료: 로그인 + 상태 확인 + punch_out_already_completed
-    } else {
-      return 32  // 실패/재시도: 추가 오류 처리 및 재시도 단계 포함
-    }
+    // 퇴근 프로세스: 평균 27-32단계
+    return 32  // 여유있게 설정
   }
 
   // 기본값
-  return 24
+  return 30
 }
 
 const getProcessStatusColor = () => {
