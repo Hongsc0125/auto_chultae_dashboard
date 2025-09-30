@@ -16,18 +16,20 @@
         </div>
       </div>
       <div class="flex-none gap-2">
-        <div class="dropdown dropdown-end">
-          <div tabindex="0" role="button" class="btn btn-ghost btn-circle avatar placeholder">
-            <div class="bg-base-300 text-base-content rounded-full w-8">
-              <span class="text-xs">👤</span>
-            </div>
-          </div>
-          <ul tabindex="0" class="mt-3 z-[1] p-2 shadow menu menu-sm dropdown-content bg-base-100 text-base-content rounded-box w-52 border">
-            <li class="menu-title">
-              <span class="text-base-content/70">{{ authStore.user?.username }}님</span>
-            </li>
-            <li><a @click="handleLogout" class="text-error">로그아웃</a></li>
-          </ul>
+        <div class="flex items-center gap-3">
+          <span class="text-sm text-base-content/70">{{ authStore.user?.username }}님</span>
+          <button @click="handleLogout" class="btn btn-sm btn-ghost text-error">
+            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1"></path>
+            </svg>
+            로그아웃
+          </button>
+          <button @click="showDeleteModal = true" class="btn btn-sm btn-error">
+            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"></path>
+            </svg>
+            회원탈퇴
+          </button>
         </div>
       </div>
     </div>
@@ -35,7 +37,30 @@
     <!-- 메인 컨테이너 -->
     <div class="container mx-auto p-6 max-w-7xl">
       <!-- 상태 카드 섹션 -->
-      <div class="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
+      <div class="grid grid-cols-1 md:grid-cols-4 gap-6 mb-8">
+        <!-- 출퇴근 활성화 토글 -->
+        <div class="stats shadow bg-base-200">
+          <div class="stat">
+            <div class="stat-figure text-secondary">
+              <svg class="w-6 h-6" fill="currentColor" viewBox="0 0 20 20">
+                <path fill-rule="evenodd" d="M12.395 2.553a1 1 0 00-1.45-.385c-.345.23-.614.558-.822.88-.214.33-.403.713-.57 1.116-.334.804-.614 1.768-.84 2.734a31.365 31.365 0 00-.613 3.58 2.64 2.64 0 01-.945-1.067c-.328-.68-.398-1.534-.398-2.654A1 1 0 005.05 6.05 6.981 6.981 0 003 11a7 7 0 1011.95-4.95c-.592-.591-.98-.985-1.348-1.467-.363-.476-.724-1.063-1.207-2.03zM12.12 15.12A3 3 0 017 13s.879.5 2.5.5c0-1 .5-4 1.25-4.5.5 1 .786 1.293 1.371 1.879A2.99 2.99 0 0113 13a2.99 2.99 0 01-.879 2.121z"></path>
+              </svg>
+            </div>
+            <div class="stat-title text-base-content/70">자동 출퇴근</div>
+            <div class="stat-value text-lg">
+              <label class="label cursor-pointer justify-start gap-3">
+                <input
+                  type="checkbox"
+                  class="toggle toggle-primary"
+                  v-model="isActive"
+                  @change="updateUserStatus"
+                />
+                <span class="text-sm">{{ isActive ? '활성화' : '비활성화' }}</span>
+              </label>
+            </div>
+          </div>
+        </div>
+
         <!-- 서버 상태 -->
         <div class="stats shadow bg-base-200">
           <div class="stat">
@@ -318,6 +343,69 @@
         </div>
       </div>
     </div>
+
+    <!-- 회원탈퇴 확인 모달 -->
+    <div v-if="showDeleteModal" class="modal modal-open">
+      <div class="modal-box max-w-md">
+        <div class="flex items-center justify-between mb-6">
+          <h3 class="text-xl font-bold text-error">⚠️ 회원탈퇴</h3>
+          <button @click="showDeleteModal = false" class="btn btn-sm btn-circle btn-ghost">
+            ✕
+          </button>
+        </div>
+
+        <div class="space-y-4">
+          <div class="alert alert-error">
+            <svg class="w-6 h-6" fill="currentColor" viewBox="0 0 20 20">
+              <path fill-rule="evenodd" d="M8.257 3.099c.765-1.36 2.722-1.36 3.486 0l5.58 9.92c.75 1.334-.213 2.98-1.742 2.98H4.42c-1.53 0-2.493-1.646-1.743-2.98l5.58-9.92zM11 13a1 1 0 11-2 0 1 1 0 012 0zm-1-8a1 1 0 00-1 1v3a1 1 0 002 0V6a1 1 0 00-1-1z"></path>
+            </svg>
+            <div>
+              <h4 class="font-bold">데이터 완전삭제 경고</h4>
+              <p class="text-sm">모든 데이터가 영구적으로 삭제됩니다. 관리자도 복구할 수 없습니다.</p>
+            </div>
+          </div>
+
+          <div class="bg-base-200 p-4 rounded-lg">
+            <h4 class="font-semibold mb-2">삭제될 데이터:</h4>
+            <ul class="text-sm space-y-1 text-base-content/70">
+              <li>• 계정 정보 (사용자 ID, 비밀번호)</li>
+              <li>• 모든 출퇴근 기록</li>
+              <li>• 하트비트 로그</li>
+              <li>• 기타 모든 활동 기록</li>
+            </ul>
+          </div>
+
+          <div class="bg-warning/10 p-4 rounded-lg border border-warning/20">
+            <p class="text-sm font-medium">재가입 시에도 이전 데이터는 복구되지 않습니다.</p>
+          </div>
+
+          <div class="form-control">
+            <label class="label cursor-pointer justify-start gap-3">
+              <input
+                type="checkbox"
+                class="checkbox checkbox-error"
+                v-model="deleteConfirmed"
+              />
+              <span class="text-sm">위 내용을 이해했으며, 회원탈퇴에 동의합니다.</span>
+            </label>
+          </div>
+        </div>
+
+        <div class="modal-action">
+          <button @click="showDeleteModal = false" class="btn btn-ghost">
+            취소
+          </button>
+          <button
+            @click="handleDeleteAccount"
+            :disabled="!deleteConfirmed"
+            class="btn btn-error"
+            :class="{ 'loading': isDeleting }"
+          >
+            {{ isDeleting ? '삭제 중...' : '회원탈퇴' }}
+          </button>
+        </div>
+      </div>
+    </div>
   </div>
 </template>
 
@@ -344,6 +432,10 @@ const logs = ref<any[]>([])
 const selectedLog = ref<any>(null)
 const detailLogs = ref<any[]>([])
 const isLoadingHeartbeat = ref(false)
+const isActive = ref(false)
+const showDeleteModal = ref(false)
+const deleteConfirmed = ref(false)
+const isDeleting = ref(false)
 
 let refreshInterval: number | null = null
 
@@ -398,6 +490,73 @@ const fetchLogs = async () => {
     }
   } catch (error) {
     console.error('Logs fetch error:', error)
+  }
+}
+
+const fetchUserStatus = async () => {
+  try {
+    const response = await fetch('/api/web/user/status', {
+      headers: authStore.getAuthHeaders()
+    })
+    const data = await response.json()
+    if (data.success) {
+      isActive.value = data.is_active
+    }
+  } catch (error) {
+    console.error('User status fetch error:', error)
+  }
+}
+
+const updateUserStatus = async () => {
+  try {
+    const response = await fetch('/api/web/user/status', {
+      method: 'PUT',
+      headers: {
+        ...authStore.getAuthHeaders(),
+        'Content-Type': 'application/json'
+      },
+      body: JSON.stringify({ is_active: isActive.value })
+    })
+    const data = await response.json()
+    if (data.success) {
+      console.log('User status updated:', isActive.value)
+    } else {
+      console.error('Status update error:', data.error)
+      // 실패시 원래 상태로 되돌리기
+      isActive.value = !isActive.value
+    }
+  } catch (error) {
+    console.error('Status update error:', error)
+    // 실패시 원래 상태로 되돌리기
+    isActive.value = !isActive.value
+  }
+}
+
+const handleDeleteAccount = async () => {
+  if (!deleteConfirmed.value) return
+
+  isDeleting.value = true
+  try {
+    const response = await fetch('/api/web/user/delete', {
+      method: 'DELETE',
+      headers: authStore.getAuthHeaders()
+    })
+    const data = await response.json()
+
+    if (data.success) {
+      alert('계정이 완전히 삭제되었습니다.')
+      authStore.logout()
+      router.push('/login')
+    } else {
+      alert(`계정 삭제 실패: ${data.error}`)
+    }
+  } catch (error) {
+    console.error('Account deletion error:', error)
+    alert('계정 삭제 중 오류가 발생했습니다.')
+  } finally {
+    isDeleting.value = false
+    showDeleteModal.value = false
+    deleteConfirmed.value = false
   }
 }
 
@@ -525,14 +684,24 @@ const fetchDetailLogs = async (logId: number) => {
 }
 
 const getStageColor = (stage: string) => {
-  // 완료 단계
-  if (stage.includes('complete') || stage.includes('success') || stage.includes('clicked_success')) return 'bg-success'
+  // 완료 단계 (성공적으로 끝난 작업)
+  if (stage.includes('complete') || stage.includes('success') || stage.includes('clicked_success') || stage.includes('created') || stage.includes('loaded')) return 'bg-success'
+
   // 오류/실패 단계
   if (stage.includes('failed') || stage.includes('error') || stage.includes('오류')) return 'bg-error'
+
+  // 이미 완료된 상태 (스킵)
+  if (stage.includes('already_completed')) return 'bg-info'
+
+  // 상태 확인 단계
+  if (stage.includes('checking') || stage.includes('not_completed_yet')) return 'bg-secondary'
+
   // 시작 단계
   if (stage.includes('start') || stage.includes('init')) return 'bg-primary'
-  // 진행중 단계
-  if (stage.includes('wait') || stage.includes('load') || stage.includes('fill')) return 'bg-warning'
+
+  // 진행중/대기 단계
+  if (stage.includes('wait') || stage.includes('load') || stage.includes('fill') || stage.includes('navigation')) return 'bg-warning'
+
   // 기본
   return 'bg-info'
 }
@@ -559,6 +728,12 @@ const translateStage = (stage: string) => {
     'page_load_complete': '✅ 페이지 로드 완료',
     'login_success': '🎉 로그인 성공',
     'page_stabilize_wait': '⏳ 페이지 안정화 대기',
+    'checking_punch_in_status': '🔍 출근 상태 확인',
+    'checking_punch_out_status': '🔍 퇴근 상태 확인',
+    'punch_in_already_completed': '✅ 출근 이미 완료됨',
+    'punch_out_already_completed': '✅ 퇴근 이미 완료됨',
+    'punch_in_not_completed_yet': '⏰ 출근 미완료 상태',
+    'punch_out_not_completed_yet': '⏰ 퇴근 미완료 상태',
     'popup_close_start': '❌ 팝업 닫기 시작',
     'popup_close_complete': '✅ 팝업 닫기 완료',
     'button_click_start': '🎯 버튼 클릭 시작',
@@ -590,6 +765,12 @@ const getStageDescription = (stage: string) => {
     'page_load_complete': '페이지 로드가 완전히 완료되었습니다',
     'login_success': '로그인이 성공적으로 완료되었습니다',
     'page_stabilize_wait': '페이지가 안정화되길 기다립니다',
+    'checking_punch_in_status': '현재 출근 상태를 확인합니다',
+    'checking_punch_out_status': '현재 퇴근 상태를 확인합니다',
+    'punch_in_already_completed': '이미 출근 처리가 완료된 상태입니다',
+    'punch_out_already_completed': '이미 퇴근 처리가 완료된 상태입니다',
+    'punch_in_not_completed_yet': '출근 처리가 아직 완료되지 않았습니다',
+    'punch_out_not_completed_yet': '퇴근 처리가 아직 완료되지 않았습니다',
     'popup_close_start': '방해되는 팝업창들을 닫기 시작합니다',
     'popup_close_complete': '모든 팝업창이 성공적으로 닫혔습니다',
     'button_click_start': '출퇴근 버튼을 찾고 클릭을 시도합니다',
@@ -635,7 +816,14 @@ const calculateStepDuration = (prevTime: string, currentTime: string) => {
 
 const getExpectedSteps = () => {
   // 일반적인 성공 시나리오의 예상 단계 수
-  return selectedLog.value?.status === 'success' ? 25 : 30
+  // 기본 로그인 단계 (20단계) + 상태 확인 및 처리 단계 (9-10단계)
+  if (selectedLog.value?.status === 'success') {
+    return 29  // 성공 시나리오: 29단계
+  } else if (selectedLog.value?.status === 'already_done') {
+    return 22  // 이미 완료 시나리오: 상태 확인 후 종료
+  } else {
+    return 35  // 실패/재시도 시나리오: 추가 단계 포함
+  }
 }
 
 onMounted(() => {
@@ -643,12 +831,14 @@ onMounted(() => {
   fetchServerStatus()
   fetchTodayStatus()
   fetchLogs()
+  fetchUserStatus()
 
   // 30초마다 데이터 새로고침
   refreshInterval = setInterval(() => {
     fetchServerStatus()
     fetchTodayStatus()
     fetchLogs()
+    fetchUserStatus()
   }, 30000)
 })
 

@@ -208,14 +208,64 @@
             </div>
           </div>
 
+          <!-- 이용약관 동의 -->
+          <div class="space-y-3">
+            <div class="form-control">
+              <label class="label cursor-pointer justify-start gap-3">
+                <input
+                  type="checkbox"
+                  class="checkbox checkbox-primary"
+                  v-model="termsAgreed"
+                />
+                <span class="text-sm">
+                  <span class="font-medium">서비스 이용약관</span>에 동의합니다.
+                </span>
+              </label>
+            </div>
+
+            <div class="form-control">
+              <label class="label cursor-pointer justify-start gap-3">
+                <input
+                  type="checkbox"
+                  class="checkbox checkbox-primary"
+                  v-model="privacyAgreed"
+                />
+                <span class="text-sm">
+                  <span class="font-medium">개인정보 처리방침</span>에 동의합니다.
+                </span>
+              </label>
+            </div>
+
+            <div class="form-control">
+              <label class="label cursor-pointer justify-start gap-3">
+                <input
+                  type="checkbox"
+                  class="checkbox checkbox-primary"
+                  v-model="automationAgreed"
+                />
+                <span class="text-sm">
+                  출퇴근 <span class="font-medium">자동화 서비스 이용</span>에 동의합니다.
+                </span>
+              </label>
+            </div>
+
+            <div class="bg-warning/10 p-3 rounded-lg border border-warning/20">
+              <div class="text-xs text-warning-content">
+                ⚠️ 자동화 서비스는 회사 계정 정보를 이용하여 자동으로 출퇴근 처리를 수행합니다.
+                계정 정보는 암호화되어 안전하게 저장되며, 서비스 목적 외에는 사용되지 않습니다.
+              </div>
+            </div>
+          </div>
+
           <!-- 회원가입 버튼 -->
           <button
             type="submit"
-            :disabled="registerLoading"
+            :disabled="registerLoading || !allAgreed"
             class="btn btn-primary w-full"
+            :class="{ 'btn-disabled': !allAgreed }"
           >
             <span v-if="registerLoading" class="loading loading-spinner loading-sm"></span>
-            {{ registerLoading ? '가입 중...' : '회원가입' }}
+            {{ registerLoading ? '가입 중...' : allAgreed ? '회원가입' : '모든 약관에 동의해주세요' }}
           </button>
         </form>
       </div>
@@ -224,7 +274,7 @@
 </template>
 
 <script setup lang="ts">
-import { ref, reactive } from 'vue'
+import { ref, reactive, computed } from 'vue'
 import { useRouter } from 'vue-router'
 import { useAuthStore } from '@/stores/auth'
 import IconStar from '@/components/icons/IconStar.vue'
@@ -237,6 +287,16 @@ const error = ref('')
 const showRegister = ref(false)
 const registerLoading = ref(false)
 const registerError = ref('')
+
+// 약관 동의 체크박스
+const termsAgreed = ref(false)
+const privacyAgreed = ref(false)
+const automationAgreed = ref(false)
+
+// 모든 약관 동의 여부 계산
+const allAgreed = computed(() => {
+  return termsAgreed.value && privacyAgreed.value && automationAgreed.value
+})
 
 const loginForm = reactive({
   username: '',
@@ -266,6 +326,12 @@ const handleLogin = async () => {
 }
 
 const handleRegister = async () => {
+  // 약관 동의 체크
+  if (!allAgreed.value) {
+    registerError.value = '모든 약관에 동의해야 회원가입이 가능합니다.'
+    return
+  }
+
   registerLoading.value = true
   registerError.value = ''
 
@@ -277,6 +343,10 @@ const handleRegister = async () => {
     )
     if (success) {
       showRegister.value = false
+      // 동의 상태 초기화
+      termsAgreed.value = false
+      privacyAgreed.value = false
+      automationAgreed.value = false
       // 자동 로그인
       loginForm.username = registerForm.username
       loginForm.password = registerForm.password
