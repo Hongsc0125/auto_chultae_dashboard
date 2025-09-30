@@ -29,6 +29,12 @@ export default defineConfig({
   },
   preview: {
     host: true,
-    port: 6500
+    port: 6500,
+    allowedHosts: [
+      'localhost',
+      '127.0.0.1',
+      'chultae-auto.xyz',
+      'www.chultae-auto.xyz'
+    ]
   },
 })
