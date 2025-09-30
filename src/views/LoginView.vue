@@ -6,7 +6,7 @@
         <div class="avatar mb-4">
           <div class="w-16 rounded-full bg-primary/10">
             <div class="flex items-center justify-center h-full">
-              <span class="text-2xl">🏢</span>
+              <IconStar :size="32" />
             </div>
           </div>
         </div>
@@ -227,6 +227,7 @@
 import { ref, reactive } from 'vue'
 import { useRouter } from 'vue-router'
 import { useAuthStore } from '@/stores/auth'
+import IconStar from '@/components/icons/IconStar.vue'
 
 const router = useRouter()
 const authStore = useAuthStore()

@@ -5,8 +5,8 @@
       <div class="flex-1">
         <div class="flex items-center gap-3">
           <div class="avatar placeholder">
-            <div class="bg-primary/10 text-primary rounded-full w-10">
-              <span class="text-sm">🏢</span>
+            <div class="bg-primary/10 text-primary rounded-full w-10 flex items-center justify-center">
+              <IconStar :size="20" />
             </div>
           </div>
           <div>
@@ -325,6 +325,7 @@
 import { ref, onMounted, onUnmounted } from 'vue'
 import { useRouter } from 'vue-router'
 import { useAuthStore } from '@/stores/auth'
+import IconStar from '@/components/icons/IconStar.vue'
 
 const router = useRouter()
 const authStore = useAuthStore()
