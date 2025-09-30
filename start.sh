@@ -27,6 +27,66 @@ log_message() {
     echo "[$timestamp] [$level] $message" | tee -a "$LOG_FILE"
 }
 
+# 포트에서 실행 중인 프로세스 찾기 및 종료
+kill_port_processes() {
+    local port="$1"
+    echo "🔍 포트 $port에서 실행 중인 프로세스를 확인합니다..."
+
+    # lsof를 사용하여 포트를 사용하는 프로세스 찾기
+    local pids=$(lsof -ti :$port 2>/dev/null)
+
+    if [ -n "$pids" ]; then
+        echo "⚠️  포트 $port에서 실행 중인 프로세스를 발견했습니다:"
+        for pid in $pids; do
+            local process_info=$(ps -p "$pid" -o pid,ppid,cmd --no-headers 2>/dev/null)
+            if [ -n "$process_info" ]; then
+                echo "   PID $pid: $process_info"
+                log_message "WARN" "포트 $port 사용 중인 프로세스 발견 (PID: $pid)"
+            fi
+        done
+
+        echo "🛑 기존 프로세스들을 종료합니다..."
+        for pid in $pids; do
+            if ps -p "$pid" > /dev/null 2>&1; then
+                echo "   PID $pid 종료 중..."
+                kill "$pid" 2>/dev/null
+                log_message "INFO" "포트 $port 프로세스 종료 시도 (PID: $pid)"
+
+                # 프로세스 종료 대기 (최대 5초)
+                local count=0
+                while ps -p "$pid" > /dev/null 2>&1 && [ $count -lt 5 ]; do
+                    sleep 1
+                    count=$((count + 1))
+                done
+
+                # 강제 종료가 필요한 경우
+                if ps -p "$pid" > /dev/null 2>&1; then
+                    echo "   PID $pid 강제 종료..."
+                    kill -9 "$pid" 2>/dev/null
+                    log_message "WARN" "포트 $port 프로세스 강제 종료 (PID: $pid)"
+                else
+                    log_message "INFO" "포트 $port 프로세스 정상 종료 (PID: $pid)"
+                fi
+            fi
+        done
+
+        # 최종 확인
+        local remaining_pids=$(lsof -ti :$port 2>/dev/null)
+        if [ -n "$remaining_pids" ]; then
+            echo "❌ 일부 프로세스가 여전히 실행 중입니다. 수동으로 확인하세요."
+            log_message "ERROR" "포트 $port 정리 실패 - 일부 프로세스 남아있음"
+            return 1
+        else
+            echo "✅ 포트 $port가 정리되었습니다."
+            log_message "INFO" "포트 $port 정리 완료"
+        fi
+    else
+        echo "✅ 포트 $port는 사용 중이지 않습니다."
+    fi
+
+    return 0
+}
+
 # 서버 상태 확인
 check_status() {
     if [ -f "$PID_FILE" ]; then
@@ -48,16 +108,20 @@ check_status() {
 
 # 서버 시작
 start_server() {
-    if check_status > /dev/null 2>&1; then
-        echo "⚠️  서버가 이미 실행 중입니다"
-        check_status
-        return 1
-    fi
-
     create_log_dirs
 
     echo "🚀 Auto Chultae Dashboard 서버를 시작합니다..."
     log_message "INFO" "서버 시작 프로세스 시작"
+
+    # 기존 관리되는 서버 확인
+    if check_status > /dev/null 2>&1; then
+        echo "⚠️  관리되는 서버가 이미 실행 중입니다"
+        check_status
+        return 1
+    fi
+
+    # 포트 6500에서 실행 중인 모든 프로세스 정리
+    kill_port_processes "$PORT"
 
     # Node.js 버전 확인
     echo "📋 Node.js 버전 확인 중..."
