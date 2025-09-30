@@ -10,7 +10,7 @@
             </div>
           </div>
           <div>
-            <h1 class="text-xl font-bold text-base-content">출근 대시보드</h1>
+            <h1 class="text-xl font-bold text-base-content">출퇴근</h1>
             <p class="text-xs text-base-content/70">실시간 출퇴근 모니터링 시스템</p>
           </div>
         </div>
@@ -44,7 +44,7 @@
                 <path fill-rule="evenodd" d="M2 5a2 2 0 012-2h12a2 2 0 012 2v2a2 2 0 01-2 2H4a2 2 0 01-2-2V5zm14 1a1 1 0 11-2 0 1 1 0 012 0zM2 13a2 2 0 012-2h12a2 2 0 012 2v2a2 2 0 01-2 2H4a2 2 0 01-2-2v-2zm14 1a1 1 0 11-2 0 1 1 0 012 0z"></path>
               </svg>
             </div>
-            <div class="stat-title text-base-content/70">메인 서버</div>
+            <div class="stat-title text-base-content/70">서버상태</div>
             <div class="stat-value text-lg">
               <div :class="['badge badge-lg', serverStatus.main ? 'badge-success' : 'badge-error']">
                 {{ serverStatus.main ? '온라인' : '오프라인' }}
