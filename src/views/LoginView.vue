@@ -250,9 +250,9 @@
             </div>
 
             <div class="bg-warning/10 p-3 rounded-lg border border-warning/20">
-              <div class="text-xs text-warning-content">
+              <div class="text-xs text-red-400">
                 ⚠️ 자동화 서비스는 회사 계정 정보를 이용하여 자동으로 출퇴근 처리를 수행합니다.
-                계정 정보는 암호화되어 안전하게 저장되며, 서비스 목적 외에는 사용되지 않습니다.
+                계정 정보는 안전하게 저장되며, 서비스 목적 외에는 사용되지 않습니다.
               </div>
             </div>
           </div>

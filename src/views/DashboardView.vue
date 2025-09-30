@@ -261,7 +261,7 @@
                 <h4 class="font-bold text-base-content mb-3 flex items-center gap-2">
                   📈 진행률
                 </h4>
-                <div class="space-y-2">
+                <div class="space-y-3">
                   <div class="flex justify-between text-sm">
                     <span>완료된 단계</span>
                     <span class="font-mono">{{ detailLogs.length }}/{{ getExpectedSteps() }}</span>
@@ -271,8 +271,22 @@
                     :value="detailLogs.length"
                     :max="getExpectedSteps()">
                   </progress>
-                  <div class="text-xs text-base-content/60 text-center">
-                    {{ Math.round((detailLogs.length / getExpectedSteps()) * 100) }}% 완료
+                  <div class="flex justify-between items-center">
+                    <div class="text-xs text-base-content/60">
+                      {{ Math.round((detailLogs.length / getExpectedSteps()) * 100) }}% 완료
+                    </div>
+                    <div class="text-xs text-base-content/60">
+                      남은 단계: {{ getExpectedSteps() - detailLogs.length }}개
+                    </div>
+                  </div>
+
+                  <!-- 현재 상태 표시 -->
+                  <div class="mt-3 p-2 bg-base-200 rounded-lg">
+                    <div class="text-xs text-base-content/80 mb-1">현재 상태</div>
+                    <div class="flex items-center gap-2">
+                      <div :class="['w-2 h-2 rounded-full', getProcessStatusColor()]"></div>
+                      <span class="text-sm font-medium">{{ getProcessStatusText() }}</span>
+                    </div>
                   </div>
                 </div>
               </div>
@@ -370,7 +384,7 @@
             <ul class="text-sm space-y-1 text-base-content/70">
               <li>• 계정 정보 (사용자 ID, 비밀번호)</li>
               <li>• 모든 출퇴근 기록</li>
-              <li>• 하트비트 로그</li>
+              <li>• 상세 진행단계 로그 기록</li>
               <li>• 기타 모든 활동 기록</li>
             </ul>
           </div>
@@ -815,15 +829,81 @@ const calculateStepDuration = (prevTime: string, currentTime: string) => {
 }
 
 const getExpectedSteps = () => {
-  // 일반적인 성공 시나리오의 예상 단계 수
-  // 기본 로그인 단계 (20단계) + 상태 확인 및 처리 단계 (9-10단계)
-  if (selectedLog.value?.status === 'success') {
-    return 29  // 성공 시나리오: 29단계
-  } else if (selectedLog.value?.status === 'already_done') {
-    return 22  // 이미 완료 시나리오: 상태 확인 후 종료
-  } else {
-    return 35  // 실패/재시도 시나리오: 추가 단계 포함
+  if (!selectedLog.value) return 24
+
+  const actionType = selectedLog.value.action_type
+  const status = selectedLog.value.status
+
+  // 크롤링 로직 기반 정확한 단계 수 계산
+  if (actionType === 'punch_in') {
+    // 출근 프로세스 기본 단계: 24단계
+    if (status === 'success') {
+      return 24  // 정상 완료: process_start → process_complete
+    } else if (status === 'already_done') {
+      return 20  // 이미 완료: 로그인 후 상태 확인까지만
+    } else {
+      return 30  // 실패/재시도: 추가 오류 처리 단계 포함
+    }
+  } else if (actionType === 'punch_out') {
+    // 퇴근 프로세스: 출근 기본 단계 + 퇴근 상태 확인 단계
+    if (status === 'success') {
+      return 26  // 정상 완료: 기본 24단계 + 퇴근 상태 확인 2단계
+    } else if (status === 'already_done') {
+      return 25  // 이미 완료: 로그인 + 상태 확인 + punch_out_already_completed
+    } else {
+      return 32  // 실패/재시도: 추가 오류 처리 및 재시도 단계 포함
+    }
   }
+
+  // 기본값
+  return 24
+}
+
+const getProcessStatusColor = () => {
+  if (!selectedLog.value) return 'bg-gray-400'
+
+  const status = selectedLog.value.status
+  const currentSteps = detailLogs.value.length
+  const totalSteps = getExpectedSteps()
+
+  // 완료 상태
+  if (status === 'success') return 'bg-success'
+  if (status === 'already_done') return 'bg-info'
+  if (status === 'failed') return 'bg-error'
+
+  // 진행중 상태 (in_progress)
+  if (status === 'in_progress') {
+    if (currentSteps === 0) return 'bg-warning' // 시작 전
+    if (currentSteps >= totalSteps * 0.8) return 'bg-success' // 거의 완료
+    if (currentSteps >= totalSteps * 0.5) return 'bg-primary' // 중간 진행
+    return 'bg-warning' // 초기 진행
+  }
+
+  return 'bg-gray-400'
+}
+
+const getProcessStatusText = () => {
+  if (!selectedLog.value) return '상태 불명'
+
+  const status = selectedLog.value.status
+  const currentSteps = detailLogs.value.length
+  const totalSteps = getExpectedSteps()
+  const actionType = selectedLog.value.action_type === 'punch_in' ? '출근' : '퇴근'
+
+  // 완료 상태
+  if (status === 'success') return `${actionType} 성공 완료`
+  if (status === 'already_done') return `${actionType} 이미 완료됨`
+  if (status === 'failed') return `${actionType} 처리 실패`
+
+  // 진행중 상태
+  if (status === 'in_progress') {
+    if (currentSteps === 0) return `${actionType} 처리 대기중`
+    if (currentSteps >= totalSteps * 0.8) return `${actionType} 처리 거의 완료`
+    if (currentSteps >= totalSteps * 0.5) return `${actionType} 처리 진행중`
+    return `${actionType} 처리 시작됨`
+  }
+
+  return '상태 확인중'
 }
 
 onMounted(() => {
