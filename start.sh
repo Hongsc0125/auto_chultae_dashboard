@@ -299,7 +299,7 @@ show_usage() {
 }
 
 # 메인 로직
-case "${1:-start}" in
+case "${1:-restart}" in
     "start")
         start_server
         ;;
