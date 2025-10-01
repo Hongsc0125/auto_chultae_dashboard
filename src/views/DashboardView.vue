@@ -144,12 +144,12 @@
             </h2>
             <div class="divider my-2"></div>
             <div class="overflow-x-auto max-h-80 md:max-h-96 lg:max-h-[700px]">
-              <table class="table table-zebra table-sm">
+              <table class="table table-zebra table-xs">
                 <thead class="sticky top-0 bg-base-200">
                   <tr>
-                    <th class="text-primary">시간</th>
-                    <th class="text-primary">타입</th>
-                    <th class="text-primary">상태</th>
+                    <th class="text-primary w-20">시간</th>
+                    <th class="text-primary w-12">타입</th>
+                    <th class="text-primary w-24">상태</th>
                     <th class="text-primary">메시지</th>
                   </tr>
                 </thead>
@@ -160,20 +160,29 @@
                     </td>
                   </tr>
                   <tr v-for="log in logs" :key="log.id" class="hover cursor-pointer" @click="showDetailModal(log)">
-                    <td class="font-mono text-xs">{{ formatDateTime(log.timestamp) }}</td>
-                    <td>
-                      <div class="flex items-center gap-2">
-                        <span class="text-sm">{{ log.action_type === 'punch_in' ? '📥' : '📤' }}</span>
-                        <span class="font-medium text-base-content">{{ translateActionType(log.action_type) }}</span>
+                    <td class="font-mono text-xs whitespace-nowrap">
+                      <div class="flex flex-col">
+                        <span class="text-primary font-semibold">{{ formatTime(log.timestamp) }}</span>
+                        <span class="text-base-content/60">{{ formatDate(log.timestamp) }}</span>
+                      </div>
+                    </td>
+                    <td class="text-center">
+                      <div class="flex flex-col items-center gap-1">
+                        <span class="text-lg">{{ log.action_type === 'punch_in' ? '📥' : '📤' }}</span>
+                        <span class="text-xs font-medium text-base-content/80">
+                          {{ log.action_type === 'punch_in' ? '출근' : '퇴근' }}
+                        </span>
                       </div>
                     </td>
                     <td>
-                      <div :class="['badge badge-sm', getBadgeVariant(log.status)]">
+                      <div :class="['badge badge-xs', getBadgeVariant(log.status)]">
                         {{ translateStatus(log.status) }}
                       </div>
                     </td>
-                    <td class="max-w-xs truncate" :title="translateMessage(log.message)">
-                      {{ translateMessage(log.message) }}
+                    <td class="text-xs leading-relaxed" :title="translateMessage(log.message)">
+                      <div class="line-clamp-2 break-words">
+                        {{ translateMessage(log.message) }}
+                      </div>
                     </td>
                   </tr>
                 </tbody>
@@ -499,6 +508,38 @@
   </div>
 </template>
 
+<style scoped>
+.line-clamp-2 {
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+  line-height: 1.4;
+  max-height: 2.8em;
+  text-overflow: ellipsis;
+  word-wrap: break-word;
+  hyphens: auto;
+}
+
+/* Fallback for browsers that don't support -webkit-line-clamp */
+@supports not (-webkit-line-clamp: 2) {
+  .line-clamp-2 {
+    position: relative;
+    max-height: 2.8em;
+    overflow: hidden;
+  }
+
+  .line-clamp-2::after {
+    content: '...';
+    position: absolute;
+    right: 0;
+    bottom: 0;
+    background: linear-gradient(to right, transparent, var(--fallback-b1, oklch(var(--b1))) 50%);
+    padding-left: 1rem;
+  }
+}
+</style>
+
 <script setup lang="ts">
 import { ref, computed, onMounted, onUnmounted } from 'vue'
 import { useRouter } from 'vue-router'
@@ -716,6 +757,28 @@ const formatDateTime = (timestamp: string) => {
   if (!timestamp) return '-'
   const date = new Date(timestamp)
   return isNaN(date.getTime()) ? '-' : date.toLocaleString('ko-KR')
+}
+
+const formatDate = (timestamp: string) => {
+  if (!timestamp) return '-'
+  const date = new Date(timestamp)
+  if (isNaN(date.getTime())) return '-'
+
+  const today = new Date()
+  const yesterday = new Date(today)
+  yesterday.setDate(today.getDate() - 1)
+
+  const dateStr = date.toDateString()
+  const todayStr = today.toDateString()
+  const yesterdayStr = yesterday.toDateString()
+
+  if (dateStr === todayStr) return '오늘'
+  if (dateStr === yesterdayStr) return '어제'
+
+  return date.toLocaleDateString('ko-KR', {
+    month: 'short',
+    day: 'numeric'
+  })
 }
 
 const showDetailModal = async (log: any) => {
