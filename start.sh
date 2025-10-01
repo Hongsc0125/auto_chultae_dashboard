@@ -113,11 +113,15 @@ start_server() {
     echo "🚀 Auto Chultae Dashboard 서버를 시작합니다..."
     log_message "INFO" "서버 시작 프로세스 시작"
 
-    # 기존 관리되는 서버 확인
+    # 기존 관리되는 서버가 있다면 안전하게 종료
     if check_status > /dev/null 2>&1; then
-        echo "⚠️  관리되는 서버가 이미 실행 중입니다"
-        check_status
-        return 1
+        echo "🔄 기존 관리되는 서버를 안전하게 종료합니다..."
+        local pid=$(cat "$PID_FILE")
+        log_message "INFO" "기존 서버 종료 시작 (PID: $pid)"
+
+        # 기존 서버 종료
+        stop_server_internal
+        sleep 2
     fi
 
     # 포트 6500에서 실행 중인 모든 프로세스 정리
@@ -175,7 +179,36 @@ start_server() {
     fi
 }
 
-# 서버 중지
+# 서버 중지 (내부용 - 메시지 최소화)
+stop_server_internal() {
+    if [ -f "$PID_FILE" ]; then
+        local pid=$(cat "$PID_FILE")
+        if ps -p "$pid" > /dev/null 2>&1; then
+            log_message "INFO" "기존 서버 종료 시도 (PID: $pid)"
+            kill "$pid"
+
+            # 프로세스 종료 대기 (최대 8초)
+            local count=0
+            while ps -p "$pid" > /dev/null 2>&1 && [ $count -lt 8 ]; do
+                sleep 1
+                count=$((count + 1))
+            done
+
+            if ps -p "$pid" > /dev/null 2>&1; then
+                kill -9 "$pid" 2>/dev/null
+                log_message "WARN" "기존 서버 강제 종료 (PID: $pid)"
+            else
+                log_message "INFO" "기존 서버 정상 종료 (PID: $pid)"
+            fi
+
+            rm -f "$PID_FILE"
+        else
+            rm -f "$PID_FILE"
+        fi
+    fi
+}
+
+# 서버 중지 (외부용)
 stop_server() {
     if [ -f "$PID_FILE" ]; then
         local pid=$(cat "$PID_FILE")
@@ -275,8 +308,7 @@ case "${1:-start}" in
         ;;
     "restart")
         echo "🔄 서버를 재시작합니다..."
-        stop_server
-        sleep 2
+        log_message "INFO" "서버 재시작 요청"
         start_server
         ;;
     "status")

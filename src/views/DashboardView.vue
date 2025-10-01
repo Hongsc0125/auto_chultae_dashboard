@@ -130,9 +130,9 @@
         </div>
       </div>
 
-      <!-- 상세 로그 섹션 -->
-      <div class="grid grid-cols-1 gap-6">
-        <!-- 상세 로그 테이블 -->
+      <!-- 메인 컨텐츠 섹션 (로그 & 스케줄) -->
+      <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
+        <!-- 좌측: 상세 로그 테이블 -->
         <div class="card bg-base-200 shadow-xl">
           <div class="card-body">
             <h2 class="card-title text-primary">
@@ -178,6 +178,82 @@
                   </tr>
                 </tbody>
               </table>
+            </div>
+          </div>
+        </div>
+
+        <!-- 우측: 스케줄 달력 -->
+        <div class="card bg-base-200 shadow-xl">
+          <div class="card-body">
+            <h2 class="card-title text-primary">
+              <svg class="w-5 h-5" fill="currentColor" viewBox="0 0 20 20">
+                <path fill-rule="evenodd" d="M6 2a1 1 0 00-1 1v1H4a2 2 0 00-2 2v10a2 2 0 002 2h12a2 2 0 002-2V6a2 2 0 00-2-2h-1V3a1 1 0 10-2 0v1H7V3a1 1 0 00-1-1zm0 5a1 1 0 000 2h8a1 1 0 100-2H6z"></path>
+              </svg>
+              출퇴근 스케줄
+              <div class="badge badge-secondary badge-sm">{{ currentYear }}년 {{ currentMonth }}월</div>
+            </h2>
+            <div class="divider my-2"></div>
+
+            <!-- 달력 헤더 -->
+            <div class="flex items-center justify-between mb-4">
+              <button @click="changeMonth(-1)" class="btn btn-sm btn-circle btn-outline">
+                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7"></path>
+                </svg>
+              </button>
+              <h3 class="text-lg font-bold">{{ currentYear }}년 {{ currentMonth }}월</h3>
+              <button @click="changeMonth(1)" class="btn btn-sm btn-circle btn-outline">
+                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"></path>
+                </svg>
+              </button>
+            </div>
+
+
+            <!-- 달력 그리드 -->
+            <div class="grid grid-cols-7 gap-1 text-center">
+              <!-- 요일 헤더 -->
+              <div v-for="day in ['일', '월', '화', '수', '목', '금', '토']" :key="day"
+                   class="p-2 text-xs font-bold text-base-content/70 bg-base-300 rounded">
+                {{ day }}
+              </div>
+
+              <!-- 빈 날짜 셀 (첫 주) -->
+              <div v-for="empty in firstDayOfWeek" :key="`empty-${empty}`" class="p-2"></div>
+
+              <!-- 날짜 셀 -->
+              <div v-for="date in daysInMonth" :key="date"
+                   @click="toggleDateSchedule(date)"
+                   :class="[
+                     'p-2 text-sm rounded transition-all duration-200 relative border border-base-300',
+                     getDateScheduleClass(date),
+                     togglingDates.has(`${currentYear}-${currentMonth.toString().padStart(2, '0')}-${date.toString().padStart(2, '0')}`)
+                       ? 'opacity-70 cursor-wait'
+                       : 'cursor-pointer hover:scale-105'
+                   ]">
+                <div class="font-medium">{{ date }}</div>
+                <div class="text-xs mt-1 flex items-center gap-1">
+                  <span v-if="togglingDates.has(`${currentYear}-${currentMonth.toString().padStart(2, '0')}-${date.toString().padStart(2, '0')}`)"
+                        class="loading loading-spinner loading-xs"></span>
+                  {{ getDateScheduleText(date) }}
+                </div>
+              </div>
+            </div>
+
+            <!-- 범례 -->
+            <div class="mt-4 flex flex-wrap gap-2 text-xs">
+              <div class="flex items-center gap-1">
+                <div class="w-3 h-3 bg-primary rounded"></div>
+                <span>출근일</span>
+              </div>
+              <div class="flex items-center gap-1">
+                <div class="w-3 h-3 bg-base-300 rounded"></div>
+                <span>휴무일</span>
+              </div>
+              <div class="flex items-center gap-1">
+                <div class="w-3 h-3 bg-secondary rounded"></div>
+                <span>커스텀</span>
+              </div>
             </div>
           </div>
         </div>
@@ -424,7 +500,7 @@
 </template>
 
 <script setup lang="ts">
-import { ref, onMounted, onUnmounted } from 'vue'
+import { ref, computed, onMounted, onUnmounted } from 'vue'
 import { useRouter } from 'vue-router'
 import { useAuthStore } from '@/stores/auth'
 import IconStar from '@/components/icons/IconStar.vue'
@@ -901,12 +977,218 @@ const getProcessStatusText = () => {
   return '상태 확인중'
 }
 
+// ==================== 달력 관련 ====================
+
+const schedules = ref<any[]>([])
+const scheduleCache = ref(new Map<string, any[]>()) // 월별 스케줄 캐시 (key: "YYYY-MM")
+const yearlyCache = ref(new Map<number, any[]>()) // 연도별 스케줄 캐시 (key: YYYY)
+const scheduleLoading = ref(false)
+const togglingDates = ref(new Set<string>()) // 토글 중인 날짜들을 추적
+const currentYear = ref(new Date().getFullYear())
+const currentMonth = ref(new Date().getMonth() + 1)
+
+// 달력 계산된 속성
+const daysInMonth = computed(() => {
+  return new Date(currentYear.value, currentMonth.value, 0).getDate()
+})
+
+const firstDayOfWeek = computed(() => {
+  return new Date(currentYear.value, currentMonth.value - 1, 1).getDay()
+})
+
+// 달력 함수들
+const changeMonth = (direction: number) => {
+  const oldYear = currentYear.value
+  const newMonth = currentMonth.value + direction
+
+  if (newMonth > 12) {
+    currentYear.value += 1
+    currentMonth.value = 1
+  } else if (newMonth < 1) {
+    currentYear.value -= 1
+    currentMonth.value = 12
+  } else {
+    currentMonth.value = newMonth
+  }
+
+  // 연도가 바뀌면 새로운 1년치 데이터 백그라운드 로드
+  if (oldYear !== currentYear.value) {
+    setTimeout(() => {
+      fetchYearlySchedules(currentYear.value)
+    }, 10)
+  }
+
+  fetchSchedules()
+}
+
+// 1년치 스케줄 프리로드
+const fetchYearlySchedules = async (year: number) => {
+  if (yearlyCache.value.has(year)) {
+    return yearlyCache.value.get(year) || []
+  }
+
+  try {
+    const response = await fetch(`/api/web/schedules/yearly?year=${year}`, {
+      headers: authStore.getAuthHeaders()
+    })
+    const data = await response.json()
+    if (data.success) {
+      const yearlySchedules = data.schedules || []
+      yearlyCache.value.set(year, yearlySchedules)
+
+      // 월별로 나누어 캐시에 저장
+      const monthlyGroups = new Map<string, any[]>()
+      yearlySchedules.forEach((schedule: any) => {
+        const monthKey = schedule.date.substring(0, 7) // "YYYY-MM"
+        if (!monthlyGroups.has(monthKey)) {
+          monthlyGroups.set(monthKey, [])
+        }
+        monthlyGroups.get(monthKey)!.push(schedule)
+      })
+
+      // 월별 캐시 업데이트
+      monthlyGroups.forEach((schedules, monthKey) => {
+        scheduleCache.value.set(monthKey, schedules)
+      })
+
+      return yearlySchedules
+    }
+  } catch (error) {
+    console.error('연간 스케줄 조회 오류:', error)
+  }
+  return []
+}
+
+// 빠른 월별 스케줄 로드 (캐시 우선)
+const fetchSchedules = async () => {
+  const monthKey = `${currentYear.value}-${currentMonth.value.toString().padStart(2, '0')}`
+
+  // 1. 캐시에서 먼저 확인
+  if (scheduleCache.value.has(monthKey)) {
+    schedules.value = scheduleCache.value.get(monthKey) || []
+    return
+  }
+
+  // 2. 이번 달 스케줄만 빠르게 가져오기 (즉시 표시)
+  try {
+    const response = await fetch(`/api/web/schedules?year=${currentYear.value}&month=${currentMonth.value}`, {
+      headers: authStore.getAuthHeaders()
+    })
+    const data = await response.json()
+    if (data.success) {
+      schedules.value = data.schedules || []
+      scheduleCache.value.set(monthKey, schedules.value)
+    }
+  } catch (error) {
+    console.error('스케줄 조회 오류:', error)
+  }
+
+  // 3. 백그라운드에서 1년치 프리로드 (성능 향상)
+  setTimeout(() => {
+    fetchYearlySchedules(currentYear.value)
+  }, 100)
+}
+
+const getDateSchedule = (date: number) => {
+  const dateStr = `${currentYear.value}-${currentMonth.value.toString().padStart(2, '0')}-${date.toString().padStart(2, '0')}`
+  return schedules.value.find(s => s.date === dateStr)
+}
+
+const getDateScheduleClass = (date: number) => {
+  const schedule = getDateSchedule(date)
+  if (!schedule) {
+    // 기본: 평일은 출근, 주말은 휴무
+    const dateObj = new Date(currentYear.value, currentMonth.value - 1, date)
+    const isWeekend = dateObj.getDay() === 0 || dateObj.getDay() === 6
+    return isWeekend ? 'bg-base-300 text-base-content/60' : 'bg-primary/20 text-primary border-primary/30'
+  }
+
+  if (schedule.is_workday) {
+    return schedule.schedule_type === 'custom'
+      ? 'bg-secondary text-secondary-content border-secondary'
+      : 'bg-primary text-primary-content border-primary'
+  } else {
+    return schedule.schedule_type === 'custom'
+      ? 'bg-warning/20 text-warning border-warning/30'
+      : 'bg-base-300 text-base-content/60'
+  }
+}
+
+const getDateScheduleText = (date: number) => {
+  const schedule = getDateSchedule(date)
+  if (!schedule) {
+    const dateObj = new Date(currentYear.value, currentMonth.value - 1, date)
+    const isWeekend = dateObj.getDay() === 0 || dateObj.getDay() === 6
+    return isWeekend ? '휴무' : '출근'
+  }
+  return schedule.is_workday ? '출근' : '휴무'
+}
+
+const toggleDateSchedule = async (date: number) => {
+  const dateStr = `${currentYear.value}-${currentMonth.value.toString().padStart(2, '0')}-${date.toString().padStart(2, '0')}`
+
+  // 이미 토글 중이면 무시
+  if (togglingDates.value.has(dateStr)) {
+    return
+  }
+
+  // 토글 시작
+  togglingDates.value.add(dateStr)
+
+  try {
+    // 1. 즉시 로컬 상태 업데이트 (낙관적 업데이트)
+    const existingSchedule = schedules.value.find(s => s.date === dateStr)
+    if (existingSchedule) {
+      // 기존 스케줄이 있으면 토글
+      existingSchedule.is_workday = !existingSchedule.is_workday
+      existingSchedule.schedule_type = 'custom'
+    } else {
+      // 기존 스케줄이 없으면 새로 추가 (평일 기본값의 반대)
+      const dateObj = new Date(currentYear.value, currentMonth.value - 1, date)
+      const isWeekend = dateObj.getDay() === 0 || dateObj.getDay() === 6
+      const newWorkday = isWeekend // 주말이면 출근으로, 평일이면 휴무로
+
+      schedules.value.push({
+        date: dateStr,
+        is_workday: newWorkday,
+        schedule_type: 'custom'
+      })
+    }
+
+    // 2. 백그라운드에서 서버에 요청
+    const response = await fetch('/api/web/schedules/toggle', {
+      method: 'POST',
+      headers: {
+        ...authStore.getAuthHeaders(),
+        'Content-Type': 'application/json'
+      },
+      body: JSON.stringify({ date: dateStr })
+    })
+
+    const data = await response.json()
+    if (!data.success) {
+      // 서버 요청 실패시 롤백
+      console.error('서버 업데이트 실패, 롤백합니다')
+      await fetchSchedules()
+    }
+  } catch (error) {
+    console.error('스케줄 토글 오류:', error)
+    // 네트워크 오류시 롤백
+    await fetchSchedules()
+  } finally {
+    // 토글 완료
+    togglingDates.value.delete(dateStr)
+  }
+}
+
+
 onMounted(() => {
   // 초기 데이터 로드
   fetchServerStatus()
   fetchTodayStatus()
   fetchLogs()
   fetchUserStatus()
+  fetchSchedules()
 
   // 30초마다 데이터 새로고침
   refreshInterval = setInterval(() => {
