@@ -1,12 +1,12 @@
 <template>
   <div class="min-h-screen bg-base-100">
-    <!-- 헤더 -->
-    <div class="navbar bg-base-100 shadow-lg border-b">
+    <!-- 헤더 - 데스크톱 -->
+    <div class="navbar bg-base-100 shadow-lg border-b hidden md:flex">
       <div class="flex-1">
         <div class="flex items-center gap-3">
-          <div class="avatar placeholder">
-            <div class="bg-primary/10 text-primary rounded-full w-10 flex items-center justify-center">
-              <IconStar :size="20" />
+          <div class="avatar">
+            <div class="w-10 rounded-full">
+              <img src="/app_icon.png" alt="App Icon" />
             </div>
           </div>
           <div>
@@ -34,10 +34,56 @@
       </div>
     </div>
 
+    <!-- 헤더 - 모바일 -->
+    <div class="navbar bg-base-100 shadow-lg border-b md:hidden px-4">
+      <div class="flex-1">
+        <div class="flex items-center gap-2">
+          <div class="avatar">
+            <div class="w-8 rounded-full">
+              <img src="/app_icon.png" alt="App Icon" />
+            </div>
+          </div>
+          <div>
+            <h1 class="text-lg font-bold text-base-content">출퇴근</h1>
+          </div>
+        </div>
+      </div>
+      <div class="flex-none">
+        <div class="dropdown dropdown-end">
+          <label tabindex="0" class="btn btn-sm btn-circle btn-ghost">
+            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 5v.01M12 12v.01M12 19v.01M12 6a1 1 0 110-2 1 1 0 010 2zm0 7a1 1 0 110-2 1 1 0 010 2zm0 7a1 1 0 110-2 1 1 0 010 2z"></path>
+            </svg>
+          </label>
+          <ul tabindex="0" class="dropdown-content z-[1] menu p-2 shadow bg-base-100 rounded-box w-52">
+            <li class="menu-title">
+              <span>{{ authStore.user?.username }}님</span>
+            </li>
+            <li>
+              <button @click="handleLogout" class="text-error">
+                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1"></path>
+                </svg>
+                로그아웃
+              </button>
+            </li>
+            <li>
+              <button @click="showDeleteModal = true" class="text-error">
+                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"></path>
+                </svg>
+                회원탈퇴
+              </button>
+            </li>
+          </ul>
+        </div>
+      </div>
+    </div>
+
     <!-- 메인 컨테이너 -->
-    <div class="container mx-auto p-6 max-w-7xl">
+    <div class="container mx-auto p-4 md:p-6 max-w-7xl">
       <!-- 상태 카드 섹션 -->
-      <div class="grid grid-cols-1 md:grid-cols-4 gap-6 mb-8">
+      <div class="grid grid-cols-1 md:grid-cols-4 gap-4 md:gap-6 mb-6 md:mb-8">
         <!-- 출퇴근 활성화 토글 -->
         <div class="stats shadow bg-base-200">
           <div class="stat">
@@ -99,9 +145,7 @@
         <div class="stats shadow bg-base-200">
           <div class="stat">
             <div class="stat-figure text-success">
-              <svg class="w-6 h-6" fill="currentColor" viewBox="0 0 20 20">
-                <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm1-12a1 1 0 10-2 0v4a1 1 0 00.293.707l2.828 2.829a1 1 0 101.415-1.415L11 9.586V6z"></path>
-              </svg>
+              <div class="text-2xl">☀️</div>
             </div>
             <div class="stat-title text-base-content/70">출근</div>
             <div class="stat-value text-lg">
@@ -116,9 +160,7 @@
         <div class="stats shadow bg-base-200">
           <div class="stat">
             <div class="stat-figure text-info">
-              <svg class="w-6 h-6" fill="currentColor" viewBox="0 0 20 20">
-                <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm1-12a1 1 0 10-2 0v4a1 1 0 00.293.707l2.828 2.829a1 1 0 101.415-1.415L11 9.586V6z"></path>
-              </svg>
+              <div class="text-2xl">🌙</div>
             </div>
             <div class="stat-title text-base-content/70">퇴근</div>
             <div class="stat-value text-lg">
@@ -131,7 +173,7 @@
       </div>
 
       <!-- 메인 컨텐츠 섹션 (로그 & 스케줄) -->
-      <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
+      <div class="grid grid-cols-1 lg:grid-cols-2 gap-4 md:gap-6">
         <!-- 좌측: 상세 로그 테이블 -->
         <div class="card bg-base-200 shadow-xl">
           <div class="card-body">
@@ -150,7 +192,7 @@
                     <th class="text-primary w-20">시간</th>
                     <th class="text-primary w-12">타입</th>
                     <th class="text-primary w-24">상태</th>
-                    <th class="text-primary">메시지</th>
+                    <th class="text-primary hidden md:table-cell">메시지</th>
                   </tr>
                 </thead>
                 <tbody>
@@ -168,7 +210,7 @@
                     </td>
                     <td class="text-center">
                       <div class="flex flex-col items-center gap-1">
-                        <span class="text-lg">{{ log.action_type === 'punch_in' ? '📥' : '📤' }}</span>
+                        <span class="text-lg">{{ log.action_type === 'punch_in' ? '☀️' : '🌙' }}</span>
                         <span class="text-xs font-medium text-base-content/80">
                           {{ log.action_type === 'punch_in' ? '출근' : '퇴근' }}
                         </span>
@@ -179,7 +221,7 @@
                         {{ translateStatus(log.status) }}
                       </div>
                     </td>
-                    <td class="text-xs leading-relaxed" :title="translateMessage(log.message)">
+                    <td class="text-xs leading-relaxed hidden md:table-cell" :title="translateMessage(log.message)">
                       <div class="line-clamp-2 break-words">
                         {{ translateMessage(log.message) }}
                       </div>
@@ -220,31 +262,32 @@
 
 
             <!-- 달력 그리드 -->
-            <div class="grid grid-cols-7 gap-1 text-center">
+            <div class="grid grid-cols-7 gap-0.5 md:gap-1 text-center">
               <!-- 요일 헤더 -->
               <div v-for="day in ['일', '월', '화', '수', '목', '금', '토']" :key="day"
-                   class="p-2 text-xs font-bold text-base-content/70 bg-base-300 rounded">
+                   class="p-1 md:p-2 text-xs font-bold text-base-content/70 bg-base-300 rounded">
                 {{ day }}
               </div>
 
               <!-- 빈 날짜 셀 (첫 주) -->
-              <div v-for="empty in firstDayOfWeek" :key="`empty-${empty}`" class="p-2"></div>
+              <div v-for="empty in firstDayOfWeek" :key="`empty-${empty}`" class="p-1 md:p-2"></div>
 
               <!-- 날짜 셀 -->
               <div v-for="date in daysInMonth" :key="date"
                    @click="toggleDateSchedule(date)"
                    :class="[
-                     'p-2 text-sm rounded transition-all duration-200 relative border border-base-300',
+                     'p-1 md:p-2 text-xs md:text-sm rounded transition-all duration-200 relative border border-base-300',
                      getDateScheduleClass(date),
                      togglingDates.has(`${currentYear}-${currentMonth.toString().padStart(2, '0')}-${date.toString().padStart(2, '0')}`)
                        ? 'opacity-70 cursor-wait'
                        : 'cursor-pointer hover:scale-105'
                    ]">
                 <div class="font-medium">{{ date }}</div>
-                <div class="text-xs mt-1 flex items-center gap-1">
+                <div class="text-xs mt-0.5 md:mt-1 flex items-center justify-center gap-1">
                   <span v-if="togglingDates.has(`${currentYear}-${currentMonth.toString().padStart(2, '0')}-${date.toString().padStart(2, '0')}`)"
                         class="loading loading-spinner loading-xs"></span>
-                  {{ getDateScheduleText(date) }}
+                  <span class="hidden md:inline">{{ getDateScheduleText(date) }}</span>
+                  <span class="md:hidden text-center">{{ getDateScheduleText(date).substring(0, 2) }}</span>
                 </div>
               </div>
             </div>
@@ -544,7 +587,6 @@
 import { ref, computed, onMounted, onUnmounted } from 'vue'
 import { useRouter } from 'vue-router'
 import { useAuthStore } from '@/stores/auth'
-import IconStar from '@/components/icons/IconStar.vue'
 
 const router = useRouter()
 const authStore = useAuthStore()
