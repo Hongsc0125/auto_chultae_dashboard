@@ -14,8 +14,8 @@ export const useAuthStore = defineStore('auth', () => {
   const isAuthenticated = ref(false)
 
   // 자동 로그아웃 관련 변수
-  let inactivityTimer: NodeJS.Timeout | null = null
-  let tokenExpiryTimer: NodeJS.Timeout | null = null
+  let inactivityTimer: number | null = null
+  let tokenExpiryTimer: number | null = null
   const INACTIVITY_TIMEOUT = 30 * 60 * 1000 // 30분 비활성
   const TOKEN_EXPIRY_TIME = 8 * 60 * 60 * 1000 // 8시간 토큰 만료
 
@@ -36,7 +36,7 @@ export const useAuthStore = defineStore('auth', () => {
     }
 
     if (isAuthenticated.value) {
-      inactivityTimer = setTimeout(() => {
+      inactivityTimer = window.setTimeout(() => {
         performAutoLogout('30분 비활성으로 인한 자동 로그아웃')
       }, INACTIVITY_TIMEOUT)
     }
@@ -48,7 +48,7 @@ export const useAuthStore = defineStore('auth', () => {
       clearTimeout(tokenExpiryTimer)
     }
 
-    tokenExpiryTimer = setTimeout(() => {
+    tokenExpiryTimer = window.setTimeout(() => {
       performAutoLogout('토큰 만료로 인한 자동 로그아웃')
     }, TOKEN_EXPIRY_TIME)
   }
@@ -103,7 +103,7 @@ export const useAuthStore = defineStore('auth', () => {
       // 남은 시간만큼 토큰 만료 타이머 설정
       const remainingTime = TOKEN_EXPIRY_TIME - elapsed
       if (tokenExpiryTimer) clearTimeout(tokenExpiryTimer)
-      tokenExpiryTimer = setTimeout(() => {
+      tokenExpiryTimer = window.setTimeout(() => {
         performAutoLogout('토큰 만료로 인한 자동 로그아웃')
       }, remainingTime)
 
