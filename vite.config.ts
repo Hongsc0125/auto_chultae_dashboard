@@ -35,6 +35,13 @@ export default defineConfig({
       '127.0.0.1',
       'chultae-auto.xyz',
       'www.chultae-auto.xyz'
-    ]
+    ],
+    proxy: {
+      '/api': {
+        target: 'http://localhost:9000',
+        changeOrigin: true,
+        secure: false
+      }
+    }
   },
 })
