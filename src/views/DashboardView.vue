@@ -551,12 +551,14 @@
           />
         </div>
 
-        <div class="modal-action">
-          <button @click="closePasswordModal" class="btn">취소</button>
+        <div class="modal-action gap-3">
+          <button @click="closePasswordModal" class="btn btn-outline flex-1">
+            취소
+          </button>
           <button
             @click="handleChangePassword"
             :disabled="!currentPassword || !newPassword || !confirmPassword || isChangingPassword"
-            class="btn btn-primary"
+            class="btn btn-primary flex-1"
           >
             <span v-if="isChangingPassword" class="loading loading-spinner loading-sm"></span>
             {{ isChangingPassword ? '변경 중...' : '비밀번호 변경' }}
