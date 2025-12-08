@@ -18,6 +18,12 @@
       <div class="flex-none gap-2">
         <div class="flex items-center gap-3">
           <span class="text-sm text-base-content/70">{{ authStore.user?.username }}님</span>
+          <button @click="showPasswordModal = true" class="btn btn-sm btn-ghost text-info">
+            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 7a2 2 0 012 2m4 0a6 6 0 01-7.743 5.743L11 17H9v2H7v2H4a1 1 0 01-1-1v-2.586a1 1 0 01.293-.707l5.964-5.964A6 6 0 1121 9z"></path>
+            </svg>
+            비밀번호 변경
+          </button>
           <button @click="handleLogout" class="btn btn-sm btn-ghost text-error">
             <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
               <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1"></path>
@@ -58,6 +64,14 @@
           <ul tabindex="0" class="dropdown-content z-[1] menu p-2 shadow bg-base-100 rounded-box w-52">
             <li class="menu-title">
               <span>{{ authStore.user?.username }}님</span>
+            </li>
+            <li>
+              <button @click="showPasswordModal = true" class="text-info">
+                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 7a2 2 0 012 2m4 0a6 6 0 01-7.743 5.743L11 17H9v2H7v2H4a1 1 0 01-1-1v-2.586a1 1 0 01.293-.707l5.964-5.964A6 6 0 1121 9z"></path>
+                </svg>
+                비밀번호 변경
+              </button>
             </li>
             <li>
               <button @click="handleLogout" class="text-error">
@@ -486,6 +500,90 @@
       </div>
     </div>
 
+    <!-- 비밀번호 변경 모달 -->
+    <div v-if="showPasswordModal" class="modal modal-open">
+      <div class="modal-box max-w-md">
+        <div class="flex items-center justify-between mb-6">
+          <h3 class="text-xl font-bold text-info">🔑 비밀번호 변경</h3>
+          <button @click="closePasswordModal" class="btn btn-sm btn-circle btn-ghost">
+            ✕
+          </button>
+        </div>
+
+        <div class="space-y-4">
+          <div class="alert alert-info">
+            <svg class="w-6 h-6" fill="currentColor" viewBox="0 0 20 20">
+              <path fill-rule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7-4a1 1 0 11-2 0 1 1 0 012 0zM9 9a1 1 0 000 2v3a1 1 0 001 1h1a1 1 0 100-2v-3a1 1 0 00-1-1H9z"></path>
+            </svg>
+            <div>
+              <h4 class="font-bold">비밀번호 변경</h4>
+              <p class="text-sm">현재 비밀번호와 새 비밀번호를 입력해주세요.</p>
+            </div>
+          </div>
+
+          <div v-if="passwordError" class="alert alert-error">
+            <svg class="w-6 h-6" fill="currentColor" viewBox="0 0 20 20">
+              <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zM8.707 7.293a1 1 0 00-1.414 1.414L8.586 10l-1.293 1.293a1 1 0 101.414 1.414L10 11.414l1.293 1.293a1 1 0 001.414-1.414L11.414 10l1.293-1.293a1 1 0 00-1.414-1.414L10 8.586 8.707 7.293z"></path>
+            </svg>
+            <span class="text-sm">{{ passwordError }}</span>
+          </div>
+
+          <div class="form-control">
+            <label class="label">
+              <span class="label-text">현재 비밀번호</span>
+            </label>
+            <input
+              type="password"
+              placeholder="현재 비밀번호를 입력하세요"
+              class="input input-bordered"
+              v-model="currentPassword"
+              @keyup.enter="handleChangePassword"
+            />
+          </div>
+
+          <div class="form-control">
+            <label class="label">
+              <span class="label-text">새 비밀번호</span>
+            </label>
+            <input
+              type="password"
+              placeholder="새 비밀번호를 입력하세요"
+              class="input input-bordered"
+              v-model="newPassword"
+              @keyup.enter="handleChangePassword"
+            />
+          </div>
+
+          <div class="form-control">
+            <label class="label">
+              <span class="label-text">새 비밀번호 확인</span>
+            </label>
+            <input
+              type="password"
+              placeholder="새 비밀번호를 다시 입력하세요"
+              class="input input-bordered"
+              v-model="confirmPassword"
+              @keyup.enter="handleChangePassword"
+            />
+          </div>
+        </div>
+
+        <div class="modal-action">
+          <button @click="closePasswordModal" class="btn btn-ghost">
+            취소
+          </button>
+          <button
+            @click="handleChangePassword"
+            :disabled="!currentPassword || !newPassword || !confirmPassword || isChangingPassword"
+            class="btn btn-info"
+            :class="{ 'loading': isChangingPassword }"
+          >
+            {{ isChangingPassword ? '변경 중...' : '비밀번호 변경' }}
+          </button>
+        </div>
+      </div>
+    </div>
+
     <!-- 회원탈퇴 확인 모달 -->
     <div v-if="showDeleteModal" class="modal modal-open">
       <div class="modal-box max-w-md">
@@ -610,6 +708,14 @@ const showDeleteModal = ref(false)
 const deleteConfirmed = ref(false)
 const isDeleting = ref(false)
 
+// 비밀번호 변경 관련
+const showPasswordModal = ref(false)
+const currentPassword = ref('')
+const newPassword = ref('')
+const confirmPassword = ref('')
+const passwordError = ref('')
+const isChangingPassword = ref(false)
+
 let refreshInterval: number | null = null
 
 const handleLogout = () => {
@@ -730,6 +836,68 @@ const handleDeleteAccount = async () => {
     isDeleting.value = false
     showDeleteModal.value = false
     deleteConfirmed.value = false
+  }
+}
+
+const closePasswordModal = () => {
+  showPasswordModal.value = false
+  currentPassword.value = ''
+  newPassword.value = ''
+  confirmPassword.value = ''
+  passwordError.value = ''
+}
+
+const handleChangePassword = async () => {
+  // 입력값 검증
+  if (!currentPassword.value || !newPassword.value || !confirmPassword.value) {
+    passwordError.value = '모든 필드를 입력해주세요.'
+    return
+  }
+
+  if (newPassword.value !== confirmPassword.value) {
+    passwordError.value = '새 비밀번호가 일치하지 않습니다.'
+    return
+  }
+
+  if (newPassword.value.length < 4) {
+    passwordError.value = '새 비밀번호는 최소 4자 이상이어야 합니다.'
+    return
+  }
+
+  if (currentPassword.value === newPassword.value) {
+    passwordError.value = '현재 비밀번호와 새 비밀번호가 동일합니다.'
+    return
+  }
+
+  isChangingPassword.value = true
+  passwordError.value = ''
+
+  try {
+    const response = await fetch('/api/web/user/password', {
+      method: 'PUT',
+      headers: {
+        ...authStore.getAuthHeaders(),
+        'Content-Type': 'application/json'
+      },
+      body: JSON.stringify({
+        current_password: currentPassword.value,
+        new_password: newPassword.value
+      })
+    })
+
+    const data = await response.json()
+
+    if (data.success) {
+      alert('비밀번호가 성공적으로 변경되었습니다.')
+      closePasswordModal()
+    } else {
+      passwordError.value = data.error || '비밀번호 변경에 실패했습니다.'
+    }
+  } catch (error) {
+    console.error('Password change error:', error)
+    passwordError.value = '비밀번호 변경 중 오류가 발생했습니다.'
+  } finally {
+    isChangingPassword.value = false
   }
 }
 
