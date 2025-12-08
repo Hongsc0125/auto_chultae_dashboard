@@ -502,82 +502,63 @@
 
     <!-- 비밀번호 변경 모달 -->
     <div v-if="showPasswordModal" class="modal modal-open">
-      <div class="modal-box max-w-md">
-        <div class="flex items-center justify-between mb-6">
-          <h3 class="text-xl font-bold text-info">🔑 비밀번호 변경</h3>
-          <button @click="closePasswordModal" class="btn btn-sm btn-circle btn-ghost">
-            ✕
-          </button>
+      <div class="modal-box">
+        <h3 class="font-bold text-lg mb-4">비밀번호 변경</h3>
+
+        <div v-if="passwordError" class="alert alert-error mb-4">
+          <svg xmlns="http://www.w3.org/2000/svg" class="stroke-current shrink-0 h-6 w-6" fill="none" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 14l2-2m0 0l2-2m-2 2l-2-2m2 2l2 2m7-2a9 9 0 11-18 0 9 9 0 0118 0z" />
+          </svg>
+          <span>{{ passwordError }}</span>
         </div>
 
-        <div class="space-y-4">
-          <div class="alert alert-info">
-            <svg class="w-6 h-6" fill="currentColor" viewBox="0 0 20 20">
-              <path fill-rule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7-4a1 1 0 11-2 0 1 1 0 012 0zM9 9a1 1 0 000 2v3a1 1 0 001 1h1a1 1 0 100-2v-3a1 1 0 00-1-1H9z"></path>
-            </svg>
-            <div>
-              <h4 class="font-bold">비밀번호 변경</h4>
-              <p class="text-sm">현재 비밀번호와 새 비밀번호를 입력해주세요.</p>
-            </div>
-          </div>
+        <div class="form-control w-full mb-4">
+          <label class="label">
+            <span class="label-text font-medium">현재 비밀번호</span>
+          </label>
+          <input
+            type="password"
+            placeholder="현재 비밀번호를 입력하세요"
+            class="input input-bordered w-full"
+            v-model="currentPassword"
+            @keyup.enter="handleChangePassword"
+          />
+        </div>
 
-          <div v-if="passwordError" class="alert alert-error">
-            <svg class="w-6 h-6" fill="currentColor" viewBox="0 0 20 20">
-              <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zM8.707 7.293a1 1 0 00-1.414 1.414L8.586 10l-1.293 1.293a1 1 0 101.414 1.414L10 11.414l1.293 1.293a1 1 0 001.414-1.414L11.414 10l1.293-1.293a1 1 0 00-1.414-1.414L10 8.586 8.707 7.293z"></path>
-            </svg>
-            <span class="text-sm">{{ passwordError }}</span>
-          </div>
+        <div class="form-control w-full mb-4">
+          <label class="label">
+            <span class="label-text font-medium">새 비밀번호</span>
+          </label>
+          <input
+            type="password"
+            placeholder="새 비밀번호를 입력하세요"
+            class="input input-bordered w-full"
+            v-model="newPassword"
+            @keyup.enter="handleChangePassword"
+          />
+        </div>
 
-          <div class="form-control">
-            <label class="label">
-              <span class="label-text">현재 비밀번호</span>
-            </label>
-            <input
-              type="password"
-              placeholder="현재 비밀번호를 입력하세요"
-              class="input input-bordered"
-              v-model="currentPassword"
-              @keyup.enter="handleChangePassword"
-            />
-          </div>
-
-          <div class="form-control">
-            <label class="label">
-              <span class="label-text">새 비밀번호</span>
-            </label>
-            <input
-              type="password"
-              placeholder="새 비밀번호를 입력하세요"
-              class="input input-bordered"
-              v-model="newPassword"
-              @keyup.enter="handleChangePassword"
-            />
-          </div>
-
-          <div class="form-control">
-            <label class="label">
-              <span class="label-text">새 비밀번호 확인</span>
-            </label>
-            <input
-              type="password"
-              placeholder="새 비밀번호를 다시 입력하세요"
-              class="input input-bordered"
-              v-model="confirmPassword"
-              @keyup.enter="handleChangePassword"
-            />
-          </div>
+        <div class="form-control w-full mb-6">
+          <label class="label">
+            <span class="label-text font-medium">새 비밀번호 확인</span>
+          </label>
+          <input
+            type="password"
+            placeholder="새 비밀번호를 다시 입력하세요"
+            class="input input-bordered w-full"
+            v-model="confirmPassword"
+            @keyup.enter="handleChangePassword"
+          />
         </div>
 
         <div class="modal-action">
-          <button @click="closePasswordModal" class="btn btn-ghost">
-            취소
-          </button>
+          <button @click="closePasswordModal" class="btn">취소</button>
           <button
             @click="handleChangePassword"
             :disabled="!currentPassword || !newPassword || !confirmPassword || isChangingPassword"
-            class="btn btn-info"
-            :class="{ 'loading': isChangingPassword }"
+            class="btn btn-primary"
           >
+            <span v-if="isChangingPassword" class="loading loading-spinner loading-sm"></span>
             {{ isChangingPassword ? '변경 중...' : '비밀번호 변경' }}
           </button>
         </div>
