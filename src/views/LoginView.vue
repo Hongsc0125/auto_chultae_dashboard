@@ -24,8 +24,8 @@
         <div class="card-body p-8 sm:p-10">
           <h2 class="text-2xl font-bold text-center mb-8 text-white">로그인</h2>
 
-          <form @submit.prevent="handleLogin" class="space-y-6">
-            <div class="form-control space-y-2">
+          <form @submit.prevent="handleLogin" class="flex flex-col gap-6">
+            <div class="form-control flex flex-col gap-2">
               <label class="label p-0">
                 <span class="label-text font-semibold text-white">아이디</span>
               </label>
@@ -46,7 +46,7 @@
               </div>
             </div>
 
-            <div class="form-control space-y-2">
+            <div class="form-control flex flex-col gap-2">
               <label class="label p-0">
                 <span class="label-text font-semibold text-white">비밀번호</span>
               </label>
@@ -115,7 +115,7 @@
           회원가입
         </h3>
 
-        <form @submit.prevent="handleRegister" class="space-y-4">
+        <form @submit.prevent="handleRegister" class="flex flex-col gap-4">
            <!-- 사용자 ID -->
            <div class="form-control">
             <label class="label">

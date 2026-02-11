@@ -275,14 +275,14 @@
 
         <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
           <!-- 기본 정보 사이드바 -->
-          <div class="lg:col-span-1 space-y-4">
+          <div class="lg:col-span-1 flex flex-col gap-4">
             <!-- 요약 정보 -->
             <div class="card bg-gradient-to-br from-primary/10 to-secondary/10 shadow-lg">
               <div class="card-body p-4">
                 <h4 class="font-bold text-base-content mb-3 flex items-center gap-2">
                   📊 실행 요약
                 </h4>
-                <div class="space-y-3 text-sm">
+                <div class="flex flex-col gap-3 text-sm">
                   <div class="flex justify-between">
                     <span class="font-medium text-base-content/70">사용자:</span>
                     <span class="font-mono text-primary">{{ selectedLog.user_id }}</span>
@@ -325,7 +325,7 @@
                 <h4 class="font-bold text-base-content mb-3 flex items-center gap-2">
                   📈 진행률
                 </h4>
-                <div class="space-y-3">
+                <div class="flex flex-col gap-3">
                   <div class="flex justify-between text-sm">
                     <span>완료된 단계</span>
                     <span class="font-mono">{{ detailLogs.length }}/{{ getExpectedSteps() }}</span>
@@ -382,7 +382,7 @@
 
                 <!-- 타임라인 -->
                 <div v-else class="overflow-y-auto max-h-[500px] pr-2">
-                  <div class="space-y-3">
+                  <div class="flex flex-col gap-3">
                     <div v-for="(detail, index) in detailLogs" :key="index"
                          class="flex items-start gap-4 p-3 rounded-lg hover:bg-base-200/50 transition-colors">
                       <!-- 단계 번호와 아이콘 -->
@@ -423,68 +423,147 @@
     </div>
 
     <!-- 비밀번호 변경 모달 -->
-    <div v-if="showPasswordModal" class="modal modal-open">
-      <div class="modal-box">
-        <h3 class="font-bold text-lg mb-4">비밀번호 변경</h3>
+    <div v-if="showPasswordModal" class="modal modal-open" @click.self="closePasswordModal">
+      <div class="modal-box max-w-md bg-gradient-to-br from-base-100 via-base-100 to-primary/5 border border-white/10 shadow-2xl backdrop-blur-xl relative overflow-hidden">
+        <!-- 배경 장식 -->
+        <div class="absolute top-0 right-0 w-64 h-64 bg-primary/10 rounded-full blur-3xl -translate-y-1/2 translate-x-1/2"></div>
+        <div class="absolute bottom-0 left-0 w-48 h-48 bg-secondary/10 rounded-full blur-3xl translate-y-1/2 -translate-x-1/2"></div>
 
-        <div v-if="passwordError" class="alert alert-error mb-4">
-          <svg xmlns="http://www.w3.org/2000/svg" class="stroke-current shrink-0 h-6 w-6" fill="none" viewBox="0 0 24 24">
-            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 14l2-2m0 0l2-2m-2 2l-2-2m2 2l2 2m7-2a9 9 0 11-18 0 9 9 0 0118 0z" />
-          </svg>
-          <span>{{ passwordError }}</span>
-        </div>
+        <!-- 모든 콘텐츠를 flex gap으로 감싸서 간격 보장 -->
+        <div class="relative flex flex-col gap-6">
+          <!-- 헤더 -->
+          <div class="flex items-center justify-between">
+            <div class="flex items-center gap-3">
+              <div class="w-10 h-10 rounded-xl bg-gradient-to-br from-primary to-secondary flex items-center justify-center shadow-lg">
+                <svg xmlns="http://www.w3.org/2000/svg" class="w-5 h-5 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z" />
+                </svg>
+              </div>
+              <div>
+                <h3 class="text-xl font-bold text-white">비밀번호 변경</h3>
+                <p class="text-xs text-base-content/60">보안을 위해 정기적으로 변경하세요</p>
+              </div>
+            </div>
+            <button @click="closePasswordModal" class="btn btn-sm btn-circle btn-ghost hover:bg-white/10">
+              <svg xmlns="http://www.w3.org/2000/svg" class="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
+              </svg>
+            </button>
+          </div>
 
-        <div class="form-control w-full mb-4">
-          <label class="label">
-            <span class="label-text font-medium">현재 비밀번호</span>
-          </label>
-          <input
-            type="password"
-            placeholder="현재 비밀번호를 입력하세요"
-            class="input input-bordered w-full"
-            v-model="currentPassword"
-            @keyup.enter="handleChangePassword"
-          />
-        </div>
+          <!-- 에러 메시지 -->
+          <div v-if="passwordError" class="alert alert-error shadow-lg border border-error/20 animate-shake">
+            <svg xmlns="http://www.w3.org/2000/svg" class="stroke-current shrink-0 h-5 w-5" fill="none" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 14l2-2m0 0l2-2m-2 2l-2-2m2 2l2 2m7-2a9 9 0 11-18 0 9 9 0 0118 0z" />
+            </svg>
+            <span class="text-sm font-medium">{{ passwordError }}</span>
+          </div>
 
-        <div class="form-control w-full mb-4">
-          <label class="label">
-            <span class="label-text font-medium">새 비밀번호</span>
-          </label>
-          <input
-            type="password"
-            placeholder="새 비밀번호를 입력하세요"
-            class="input input-bordered w-full"
-            v-model="newPassword"
-            @keyup.enter="handleChangePassword"
-          />
-        </div>
+          <!-- 입력 폼 -->
+          <div class="flex flex-col gap-5">
+            <!-- 현재 비밀번호 -->
+            <div class="form-control">
+              <label class="label pb-2">
+                <span class="label-text font-semibold text-white flex items-center gap-2">
+                  <svg xmlns="http://www.w3.org/2000/svg" class="w-4 h-4 text-primary" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 7a2 2 0 012 2m4 0a6 6 0 01-7.743 5.743L11 17H9v2H7v2H4a1 1 0 01-1-1v-2.586a1 1 0 01.293-.707l5.964-5.964A6 6 0 1121 9z" />
+                  </svg>
+                  현재 비밀번호
+                </span>
+              </label>
+              <input
+                type="password"
+                placeholder="현재 비밀번호를 입력하세요"
+                class="input input-bordered w-full bg-base-200/50 backdrop-blur-sm border-white/10 focus:border-primary/50 focus:bg-base-200 transition-all duration-200 text-white placeholder:text-base-content/40"
+                v-model="currentPassword"
+                @keyup.enter="handleChangePassword"
+              />
+            </div>
 
-        <div class="form-control w-full mb-6">
-          <label class="label">
-            <span class="label-text font-medium">새 비밀번호 확인</span>
-          </label>
-          <input
-            type="password"
-            placeholder="새 비밀번호를 다시 입력하세요"
-            class="input input-bordered w-full"
-            v-model="confirmPassword"
-            @keyup.enter="handleChangePassword"
-          />
-        </div>
+            <!-- 구분선 -->
+            <div class="divider text-xs text-base-content/40">새 비밀번호 설정</div>
 
-        <div class="modal-action gap-3">
-          <button @click="closePasswordModal" class="btn btn-outline flex-1">
-            취소
-          </button>
-          <button
-            @click="handleChangePassword"
-            :disabled="!currentPassword || !newPassword || !confirmPassword || isChangingPassword"
-            class="btn btn-primary flex-1"
-          >
-            <span v-if="isChangingPassword" class="loading loading-spinner loading-sm"></span>
-            {{ isChangingPassword ? '변경 중...' : '비밀번호 변경' }}
-          </button>
+            <!-- 새 비밀번호 -->
+            <div class="form-control">
+              <label class="label pb-2">
+                <span class="label-text font-semibold text-white flex items-center gap-2">
+                  <svg xmlns="http://www.w3.org/2000/svg" class="w-4 h-4 text-secondary" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z" />
+                  </svg>
+                  새 비밀번호
+                </span>
+              </label>
+              <input
+                type="password"
+                placeholder="새 비밀번호를 입력하세요"
+                class="input input-bordered w-full bg-base-200/50 backdrop-blur-sm border-white/10 focus:border-secondary/50 focus:bg-base-200 transition-all duration-200 text-white placeholder:text-base-content/40"
+                v-model="newPassword"
+                @keyup.enter="handleChangePassword"
+              />
+              <label class="label pt-1">
+                <span class="label-text-alt text-base-content/50 text-xs">최소 6자 이상 권장</span>
+              </label>
+            </div>
+
+            <!-- 새 비밀번호 확인 -->
+            <div class="form-control">
+              <label class="label pb-2">
+                <span class="label-text font-semibold text-white flex items-center gap-2">
+                  <svg xmlns="http://www.w3.org/2000/svg" class="w-4 h-4 text-accent" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
+                  </svg>
+                  비밀번호 확인
+                </span>
+              </label>
+              <input
+                type="password"
+                placeholder="새 비밀번호를 다시 입력하세요"
+                class="input input-bordered w-full bg-base-200/50 backdrop-blur-sm border-white/10 focus:border-accent/50 focus:bg-base-200 transition-all duration-200 text-white placeholder:text-base-content/40"
+                v-model="confirmPassword"
+                @keyup.enter="handleChangePassword"
+              />
+            </div>
+          </div>
+
+          <!-- 액션 버튼 -->
+          <div class="flex gap-3">
+            <button
+              @click="closePasswordModal"
+              class="btn flex-1 btn-outline border-white/20 hover:bg-white/10 hover:border-white/30 text-white"
+            >
+              <svg xmlns="http://www.w3.org/2000/svg" class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
+              </svg>
+              취소
+            </button>
+            <button
+              @click="handleChangePassword"
+              :disabled="!currentPassword || !newPassword || !confirmPassword || isChangingPassword"
+              class="btn flex-1 btn-primary bg-gradient-to-r from-primary to-secondary border-0 hover:scale-105 transition-all duration-200 shadow-lg disabled:opacity-50 disabled:scale-100"
+            >
+              <span v-if="isChangingPassword" class="loading loading-spinner loading-sm"></span>
+              <svg v-else xmlns="http://www.w3.org/2000/svg" class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7" />
+              </svg>
+              {{ isChangingPassword ? '변경 중...' : '비밀번호 변경' }}
+            </button>
+          </div>
+
+          <!-- 보안 팁 -->
+          <div class="p-3 bg-info/10 border border-info/20 rounded-lg">
+            <div class="flex items-start gap-2">
+              <svg xmlns="http://www.w3.org/2000/svg" class="w-4 h-4 text-info mt-0.5 shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+              </svg>
+              <div class="text-xs text-base-content/70">
+                <p class="font-semibold text-white">보안 팁</p>
+                <ul class="list-disc list-inside flex flex-col gap-0.5 text-base-content/60">
+                  <li>숫자, 영문, 특수문자를 조합하세요</li>
+                  <li>개인정보는 사용하지 마세요</li>
+                </ul>
+              </div>
+            </div>
+          </div>
         </div>
       </div>
     </div>
@@ -499,7 +578,7 @@
           </button>
         </div>
 
-        <div class="space-y-4">
+        <div class="flex flex-col gap-4">
           <div class="alert alert-error">
             <svg class="w-6 h-6" fill="currentColor" viewBox="0 0 20 20">
               <path fill-rule="evenodd" d="M8.257 3.099c.765-1.36 2.722-1.36 3.486 0l5.58 9.92c.75 1.334-.213 2.98-1.742 2.98H4.42c-1.53 0-2.493-1.646-1.743-2.98l5.58-9.92zM11 13a1 1 0 11-2 0 1 1 0 012 0zm-1-8a1 1 0 00-1 1v3a1 1 0 002 0V6a1 1 0 00-1-1z"></path>
@@ -512,7 +591,7 @@
 
           <div class="bg-base-200 p-4 rounded-lg">
             <h4 class="font-semibold mb-2">삭제될 데이터:</h4>
-            <ul class="text-sm space-y-1 text-base-content/70">
+            <ul class="text-sm flex flex-col gap-1 text-base-content/70">
               <li>• 계정 정보 (사용자 ID, 비밀번호)</li>
               <li>• 모든 출퇴근 기록</li>
               <li>• 상세 진행단계 로그 기록</li>
