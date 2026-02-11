@@ -10,7 +10,7 @@
     <div class="w-full max-w-md relative z-10">
       <!-- 헤더 섹션 -->
       <div class="text-center mb-8">
-        <div class="inline-flex items-center justify-center w-20 h-20 rounded-2xl bg-base-100/50 backdrop-blur-md shadow-xl mb-6 ring-1 ring-white/10">
+        <div class="inline-flex items-center justify-center w-20 h-20 rounded-2xl bg-base-100/50 backdrop-blur-md shadow-xl mb-6">
           <IconStar :size="40" class="text-primary drop-shadow-md" />
         </div>
         <h1 class="text-3xl font-bold bg-clip-text text-transparent bg-gradient-to-r from-primary to-secondary mb-2">
@@ -20,17 +20,17 @@
       </div>
 
       <!-- 로그인 카드 -->
-      <div class="card bg-base-100/70 backdrop-blur-lg shadow-2xl border border-white/10">
-        <div class="card-body p-8">
-          <h2 class="text-xl font-bold text-center mb-6">로그인</h2>
+      <div class="card bg-base-100/90 backdrop-blur-lg shadow-2xl border border-white/5">
+        <div class="card-body p-8 sm:p-10">
+          <h2 class="text-2xl font-bold text-center mb-8">로그인</h2>
 
-          <form @submit.prevent="handleLogin" class="space-y-5">
-            <div class="form-control">
-              <label class="label">
-                <span class="label-text font-semibold">아이디</span>
+          <form @submit.prevent="handleLogin" class="space-y-6">
+            <div class="form-control space-y-2">
+              <label class="label p-0">
+                <span class="label-text font-semibold text-base">아이디</span>
               </label>
-              <div class="relative">
-                <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+              <div class="relative group">
+                <div class="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none transition-colors group-focus-within:text-primary">
                   <svg class="w-5 h-5 text-base-content/40" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" />
                   </svg>
@@ -39,19 +39,19 @@
                   type="text"
                   v-model="loginForm.username"
                   placeholder="아이디를 입력하세요"
-                  class="input input-bordered w-full pl-10 bg-base-200/50 focus:bg-base-100 transition-colors"
+                  class="input input-bordered w-full pl-11 h-12 bg-base-200/50 focus:bg-base-100 transition-all focus:ring-2 focus:ring-primary/20"
                   :class="{ 'input-error': error && !loginForm.username }"
                   required
                 />
               </div>
             </div>
 
-            <div class="form-control">
-              <label class="label">
-                <span class="label-text font-semibold">비밀번호</span>
+            <div class="form-control space-y-2">
+              <label class="label p-0">
+                <span class="label-text font-semibold text-base">비밀번호</span>
               </label>
-              <div class="relative">
-                <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+              <div class="relative group">
+                <div class="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none transition-colors group-focus-within:text-primary">
                   <svg class="w-5 h-5 text-base-content/40" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z" />
                   </svg>
@@ -60,40 +60,49 @@
                   type="password"
                   v-model="loginForm.password"
                   placeholder="비밀번호를 입력하세요"
-                  class="input input-bordered w-full pl-10 bg-base-200/50 focus:bg-base-100 transition-colors"
+                  class="input input-bordered w-full pl-11 h-12 bg-base-200/50 focus:bg-base-100 transition-all focus:ring-2 focus:ring-primary/20"
                   :class="{ 'input-error': error && !loginForm.password }"
                   required
                 />
               </div>
             </div>
 
-            <div v-if="error" class="alert alert-error text-sm py-2 shadow-lg animate-shake">
+            <div v-if="error" class="alert alert-error text-sm py-3 shadow-lg animate-shake">
               <svg xmlns="http://www.w3.org/2000/svg" class="stroke-current shrink-0 h-5 w-5" fill="none" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 14l2-2m0 0l2-2m-2 2l-2-2m2 2l2 2m7-2a9 9 0 11-18 0 9 9 0 0118 0z" /></svg>
               <span>{{ error }}</span>
             </div>
 
-            <button
-              type="submit"
-              class="btn btn-primary w-full shadow-lg hover:shadow-primary/30 transition-all duration-300"
-              :disabled="loading"
-            >
-              <span v-if="loading" class="loading loading-spinner loading-sm"></span>
-              {{ loading ? '로그인 중...' : '로그인' }}
-            </button>
+            <div class="pt-2">
+              <button
+                type="submit"
+                class="btn btn-primary w-full h-12 text-lg shadow-lg hover:shadow-primary/30 transition-all duration-300 transform hover:-translate-y-0.5"
+                :disabled="loading"
+              >
+                <span v-if="loading" class="loading loading-spinner loading-sm"></span>
+                {{ loading ? '로그인 중...' : '로그인' }}
+              </button>
+            </div>
           </form>
 
-          <div class="divider my-6 text-xs text-base-content/40">처음이신가요?</div>
+          <div class="relative py-6">
+            <div class="absolute inset-0 flex items-center">
+              <div class="w-full border-t border-base-content/10"></div>
+            </div>
+            <div class="relative flex justify-center text-sm">
+              <span class="px-2 bg-base-100 text-base-content/40">처음이신가요?</span>
+            </div>
+          </div>
 
           <button
             @click="showRegister = true"
-            class="btn btn-outline btn-block hover:bg-base-content hover:text-base-100 transition-colors"
+            class="btn btn-outline btn-block h-11 hover:bg-base-content hover:text-base-100 transition-colors border-base-content/20 hover:border-base-content"
           >
             회원가입
           </button>
         </div>
       </div>
 
-      <p class="text-center mt-8 text-xs text-base-content/40 font-medium">
+      <p class="text-center mt-8 text-xs text-base-content/30 font-medium">
         © 2026 Auto Chultae. All rights reserved.
       </p>
     </div>

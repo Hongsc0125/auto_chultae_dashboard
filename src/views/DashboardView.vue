@@ -16,9 +16,9 @@
       <div class="flex-none gap-2">
         <div class="dropdown dropdown-end">
           <div tabindex="0" role="button" class="btn btn-ghost btn-circle avatar">
-            <div class="w-10 rounded-full ring ring-primary ring-offset-base-100 ring-offset-2">
+            <div class="w-10 rounded-full">
               <div class="w-full h-full bg-neutral flex items-center justify-center text-neutral-content font-bold text-lg">
-                {{ authStore.user?.username?.charAt(0).toUpperCase() }}
+                {{ authStore.user?.username?.charAt(0).toUpperCase() || 'U' }}
               </div>
             </div>
           </div>
@@ -37,11 +37,11 @@
     </div>
 
     <!-- 메인 컨테이너 -->
-    <div class="container mx-auto p-4 md:p-6 lg:p-8 max-w-7xl animate-fade-in-up">
+    <div class="w-full max-w-[1920px] mx-auto p-4 md:p-6 lg:p-8 xl:p-12 animate-fade-in-up space-y-6">
       <!-- 상태 카드 섹션 -->
-      <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 mb-8">
+      <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 xl:gap-6">
         <!-- 출퇴근 활성화 토글 -->
-        <div class="card bg-base-100 shadow-xl border border-base-content/5 hover:border-primary/50 transition-colors">
+        <div class="card bg-base-100 shadow-xl transition-colors">
           <div class="card-body p-6 flex flex-row items-center justify-between">
             <div>
               <h3 class="stat-title text-base-content/60 text-sm font-medium mb-1">자동 출퇴근</h3>
@@ -64,7 +64,7 @@
         </div>
 
         <!-- 서버 상태 -->
-        <div class="card bg-base-100 shadow-xl border border-base-content/5">
+        <div class="card bg-base-100 shadow-xl">
           <div class="card-body p-6 flex flex-row items-center justify-between">
             <div>
               <h3 class="stat-title text-base-content/60 text-sm font-medium mb-1">서버 상태</h3>
@@ -80,7 +80,7 @@
         </div>
 
         <!-- 오늘 출근 -->
-        <div class="card bg-base-100 shadow-xl border border-base-content/5">
+        <div class="card bg-base-100 shadow-xl">
           <div class="card-body p-6 flex flex-row items-center justify-between">
             <div>
               <h3 class="stat-title text-base-content/60 text-sm font-medium mb-1">오늘 출근</h3>
@@ -95,7 +95,7 @@
         </div>
 
         <!-- 오늘 퇴근 -->
-        <div class="card bg-base-100 shadow-xl border border-base-content/5">
+        <div class="card bg-base-100 shadow-xl">
           <div class="card-body p-6 flex flex-row items-center justify-between">
             <div>
               <h3 class="stat-title text-base-content/60 text-sm font-medium mb-1">오늘 퇴근</h3>
@@ -111,38 +111,42 @@
       </div>
 
       <!-- 메인 콘텐츠: 로그와 달력 -->
-      <div class="grid grid-cols-1 lg:grid-cols-12 gap-6 h-auto lg:h-[calc(100vh-16rem)] min-h-[600px]">
+      <div class="grid grid-cols-1 lg:grid-cols-12 gap-6 xl:gap-8 h-auto lg:h-[calc(100vh-20rem)] min-h-[600px]">
         <!-- 왼쪽: 로그 (모바일: 전체, 데스크톱: 4/12) -->
-        <div class="lg:col-span-4 flex flex-col h-full">
-          <div class="card bg-base-100 shadow-xl border border-base-content/5 h-full flex flex-col">
+        <div class="lg:col-span-5 xl:col-span-4 flex flex-col h-full">
+          <div class="card bg-base-100 shadow-xl h-full flex flex-col">
             <div class="card-body p-0 flex flex-col h-full">
-              <div class="p-4 border-b border-base-content/5 flex justify-between items-center bg-base-200/50 rounded-t-xl">
+              <div class="p-4 border-b border-base-content/5 flex justify-between items-center bg-base-200/30 rounded-t-xl">
                 <h3 class="font-bold text-lg flex items-center gap-2">
                   <svg xmlns="http://www.w3.org/2000/svg" class="w-5 h-5 text-primary" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" /></svg>
                   실시간 로그
                 </h3>
                 <span class="badge badge-sm badge-ghost">{{ logs.length }}개</span>
               </div>
+              <!-- LOGS TABLE PART ALREADY HANDLED -->
 
-              <div class="flex-1 overflow-y-auto p-0 scrollbar-thin scrollbar-thumb-base-300 scrollbar-track-base-100">
-                <table class="table table-pin-rows table-xs sm:table-sm w-full">
+
+              <div class="flex-1 overflow-y-auto min-h-0 scrollbar-thin scrollbar-thumb-base-300 scrollbar-track-base-100">
+                <table class="table table-pin-rows table-fixed w-full">
                   <thead>
                     <tr class="bg-base-200/50 text-base-content/70">
                       <th class="w-20 text-center">시간</th>
-                      <th class="w-20 text-center">상태</th>
-                      <th>메시지</th>
+                      <th class="w-24 text-center">상태</th>
+                      <th class="w-auto">메시지</th>
                     </tr>
                   </thead>
                   <tbody>
                     <tr v-for="(log, index) in reversedLogs" :key="index" class="hover:bg-base-200/50 transition-colors border-b border-base-content/5 last:border-0 cursor-pointer" @click="showDetailModal(log)">
                       <td class="font-mono text-xs text-center opacity-70">{{ formatTime(log.timestamp) }}</td>
                       <td class="text-center">
-                         <div class="badge badge-xs sm:badge-sm font-medium" :class="getBadgeVariant(log.status)">
+                         <div class="badge badge-xs sm:badge-sm font-medium whitespace-nowrap" :class="getBadgeVariant(log.status)">
                           {{ translateStatus(log.status) }}
                         </div>
                       </td>
-                      <td class="break-words text-xs sm:text-sm leading-relaxed">
-                        <span class="line-clamp-1">{{ translateMessage(log.message) }}</span>
+                      <td class="text-xs sm:text-sm leading-relaxed min-w-0 overflow-hidden">
+                        <div class="truncate w-full block" :title="translateMessage(log.message)">
+                          {{ translateMessage(log.message) }}
+                        </div>
                       </td>
                     </tr>
                     <tr v-if="reversedLogs.length === 0">
@@ -161,8 +165,8 @@
         </div>
 
         <!-- 오른쪽: 달력 (모바일: 전체, 데스크톱: 8/12) -->
-        <div class="lg:col-span-8 h-full">
-          <div class="card bg-base-100 shadow-xl border border-base-content/5 h-full flex flex-col">
+        <div class="lg:col-span-7 xl:col-span-8 h-full">
+          <div class="card bg-base-100 shadow-xl h-full flex flex-col">
             <div class="card-body p-4 sm:p-6 flex flex-col h-full">
               <div class="flex flex-col sm:flex-row justify-between items-center mb-6 gap-4">
                 <h3 class="font-bold text-xl flex items-center gap-2">
@@ -194,7 +198,7 @@
                 <!-- 날짜 셀 -->
                 <div v-for="(date, index) in calendarDays" :key="index"
                      @click="date.isCurrentMonth && toggleDateSchedule(date.day)"
-                     class="bg-base-100 p-1 sm:p-2 relative transition-all duration-200 group flex flex-col"
+                     class="bg-base-100 p-1 sm:p-2 relative transition-all duration-200 group flex flex-col min-h-[80px] sm:min-h-[100px]"
                      :class="{
                        'bg-base-200/30 text-base-content/30': !date.isCurrentMonth,
                        'hover:bg-base-200/50 cursor-pointer': date.isCurrentMonth,
@@ -636,6 +640,13 @@ const fetchServerStatus = async () => {
     }
   } catch (error) {
     console.error('Server status fetch error:', error)
+    // 로컬 개발 환경용 모의 데이터
+    if (window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1') {
+      serverStatus.value = {
+        main: true,
+        watchdog: true
+      }
+    }
   }
 }
 
@@ -654,6 +665,13 @@ const fetchTodayStatus = async () => {
     }
   } catch (error) {
     console.error('Today status fetch error:', error)
+    // 로컬 개발 환경용 모의 데이터
+    if (window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1') {
+      todayStatus.value = {
+        punchIn: '08:55',
+        punchOut: ''
+      }
+    }
   }
 }
 
@@ -671,6 +689,13 @@ const fetchLogs = async () => {
     }
   } catch (error) {
     console.error('Logs fetch error:', error)
+    // 로컬 개발 환경용 모의 데이터
+    if (window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1') {
+      logs.value = [
+        { id: 1, timestamp: new Date().toISOString(), status: 'INFO', message: '출근 체크가 완료되었습니다.', action_type: 'PUNCH_IN' },
+        { id: 2, timestamp: new Date(Date.now() - 3600000).toISOString(), status: 'SUCCESS', message: '시스템 초기화 완료', action_type: 'SYSTEM' }
+      ]
+    }
   }
 }
 
@@ -685,6 +710,10 @@ const fetchUserStatus = async () => {
     }
   } catch (error) {
     console.error('User status fetch error:', error)
+    // 로컬 개발 환경용 모의 데이터
+    if (window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1') {
+      isActive.value = true
+    }
   }
 }
 
