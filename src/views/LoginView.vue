@@ -13,7 +13,7 @@
         <div class="inline-flex items-center justify-center w-20 h-20 rounded-2xl bg-base-100/50 backdrop-blur-md shadow-xl mb-6">
           <IconStar :size="40" class="text-primary drop-shadow-md" />
         </div>
-        <h1 class="text-3xl font-bold bg-clip-text text-transparent bg-gradient-to-r from-primary to-secondary mb-2">
+        <h1 class="text-3xl font-bold text-white mb-2">
           귀찮은 출퇴근
         </h1>
         <p class="text-base-content/60 font-medium"> <br> </p>
@@ -22,12 +22,12 @@
       <!-- 로그인 카드 -->
       <div class="card bg-base-100/90 backdrop-blur-lg shadow-2xl border border-white/5">
         <div class="card-body p-8 sm:p-10">
-          <h2 class="text-2xl font-bold text-center mb-8">로그인</h2>
+          <h2 class="text-2xl font-bold text-center mb-8 text-white">로그인</h2>
 
           <form @submit.prevent="handleLogin" class="space-y-6">
             <div class="form-control space-y-2">
               <label class="label p-0">
-                <span class="label-text font-semibold text-base">아이디</span>
+                <span class="label-text font-semibold text-white">아이디</span>
               </label>
               <div class="relative group">
                 <div class="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none transition-colors group-focus-within:text-primary">
@@ -39,7 +39,7 @@
                   type="text"
                   v-model="loginForm.username"
                   placeholder="아이디를 입력하세요"
-                  class="input input-bordered w-full pl-11 h-12 bg-base-200/50 focus:bg-base-100 transition-all focus:ring-2 focus:ring-primary/20"
+                  class="input input-bordered w-full pl-11 h-12 bg-base-200/50 focus:bg-base-100 text-white placeholder:text-white/40 transition-all focus:ring-2 focus:ring-primary/20"
                   :class="{ 'input-error': error && !loginForm.username }"
                   required
                 />
@@ -48,7 +48,7 @@
 
             <div class="form-control space-y-2">
               <label class="label p-0">
-                <span class="label-text font-semibold text-base">비밀번호</span>
+                <span class="label-text font-semibold text-white">비밀번호</span>
               </label>
               <div class="relative group">
                 <div class="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none transition-colors group-focus-within:text-primary">
@@ -60,7 +60,7 @@
                   type="password"
                   v-model="loginForm.password"
                   placeholder="비밀번호를 입력하세요"
-                  class="input input-bordered w-full pl-11 h-12 bg-base-200/50 focus:bg-base-100 transition-all focus:ring-2 focus:ring-primary/20"
+                  class="input input-bordered w-full pl-11 h-12 bg-base-200/50 focus:bg-base-100 text-white placeholder:text-white/40 transition-all focus:ring-2 focus:ring-primary/20"
                   :class="{ 'input-error': error && !loginForm.password }"
                   required
                 />
@@ -75,7 +75,7 @@
             <div class="pt-2">
               <button
                 type="submit"
-                class="btn btn-primary w-full h-12 text-lg shadow-lg hover:shadow-primary/30 transition-all duration-300 transform hover:-translate-y-0.5"
+                class="btn btn-primary w-full h-12 text-lg text-white shadow-lg hover:shadow-primary/30 transition-all duration-300 transform hover:-translate-y-0.5"
                 :disabled="loading"
               >
                 <span v-if="loading" class="loading loading-spinner loading-sm"></span>
@@ -89,13 +89,13 @@
               <div class="w-full border-t border-base-content/10"></div>
             </div>
             <div class="relative flex justify-center text-sm">
-              <span class="px-2 bg-base-100 text-base-content/40">처음이신가요?</span>
+              <span class="px-2 bg-base-100 text-white/60">처음이신가요?</span>
             </div>
           </div>
 
           <button
             @click="showRegister = true"
-            class="btn btn-outline btn-block h-11 hover:bg-base-content hover:text-base-100 transition-colors border-base-content/20 hover:border-base-content"
+            class="btn btn-outline btn-block h-11 text-white hover:bg-white hover:text-base-100 transition-colors border-white/20 hover:border-white"
           >
             회원가입
           </button>
@@ -110,7 +110,7 @@
     <!-- 회원가입 모달 -->
     <dialog class="modal modal-bottom sm:modal-middle" :class="{ 'modal-open': showRegister }">
       <div class="modal-box bg-base-100/90 backdrop-blur border border-white/10">
-        <h3 class="font-bold text-lg mb-6 flex items-center gap-2">
+        <h3 class="font-bold text-lg mb-6 flex items-center gap-2 text-white">
           <IconStar :size="24" class="text-secondary" />
           회원가입
         </h3>
@@ -119,13 +119,13 @@
            <!-- 사용자 ID -->
            <div class="form-control">
             <label class="label">
-              <span class="label-text">아이디</span>
+              <span class="label-text text-white">아이디</span>
             </label>
             <input
               v-model="registerForm.username"
               type="text"
               placeholder="아이디"
-              class="input input-bordered w-full"
+              class="input input-bordered w-full text-white placeholder:text-white/40"
               :class="{ 'input-error': registerError && !registerForm.username }"
               required
             />
@@ -134,13 +134,13 @@
           <!-- 비밀번호 -->
           <div class="form-control">
             <label class="label">
-              <span class="label-text">비밀번호</span>
+              <span class="label-text text-white">비밀번호</span>
             </label>
             <input
               v-model="registerForm.password"
               type="password"
               placeholder="비밀번호"
-              class="input input-bordered w-full"
+              class="input input-bordered w-full text-white placeholder:text-white/40"
               :class="{ 'input-error': registerError && !registerForm.password }"
               required
             />
@@ -149,13 +149,13 @@
           <!-- 이메일 -->
           <div class="form-control">
             <label class="label">
-              <span class="label-text">이메일</span>
+              <span class="label-text text-white">이메일</span>
             </label>
             <input
               v-model="registerForm.email"
               type="email"
               placeholder="이메일 (선택사항)"
-              class="input input-bordered w-full"
+              class="input input-bordered w-full text-white placeholder:text-white/40"
             />
           </div>
 
@@ -168,9 +168,9 @@
           <div class="form-control mt-4">
             <label class="label cursor-pointer justify-start gap-3 p-0">
               <input type="checkbox" v-model="termsAgreed" class="checkbox checkbox-primary checkbox-sm" />
-              <span class="label-text text-sm">서비스 이용약관 및 자동화 정책에 동의합니다.</span>
+              <span class="label-text text-sm text-white">서비스 이용약관 및 자동화 정책에 동의합니다.</span>
             </label>
-            <p class="text-xs text-base-content/60 mt-2 ml-8">
+            <p class="text-xs text-white/60 mt-2 ml-8">
               ※ 본 서비스는 사용자의 계정 정보를 이용하여 출퇴근을 자동화합니다.
             </p>
           </div>

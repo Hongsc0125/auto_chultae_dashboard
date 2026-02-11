@@ -4,12 +4,12 @@
     <div class="navbar bg-base-100/80 backdrop-blur-md shadow-sm border-b border-base-content/5 sticky top-0 z-50">
       <div class="flex-1">
         <a class="btn btn-ghost text-xl gap-2">
-          <div class="avatar placeholder">
-            <div class="w-8 rounded bg-neutral-focus text-neutral-content">
-              <img src="/app_icon.png" alt="Icon" class="w-full h-full object-cover" />
+          <div class="avatar">
+            <div class="w-10 h-10 rounded-2xl bg-base-100 overflow-hidden shadow-sm border border-base-content/10 transition-all hover:scale-105 hover:shadow-md cursor-pointer">
+              <img src="/app_icon.png" alt="Icon" class="w-full h-full object-cover scale-110 transform" />
             </div>
           </div>
-          <span class="font-bold bg-clip-text text-transparent bg-gradient-to-r from-primary to-secondary">출퇴근</span>
+          <span class="font-bold text-white">출퇴근</span>
           <span class="text-xs font-normal opacity-50 hidden sm:inline-block">Dashboard</span>
         </a>
       </div>
@@ -37,11 +37,11 @@
     </div>
 
     <!-- 메인 컨테이너 -->
-    <div class="w-full max-w-[1920px] mx-auto p-4 md:p-6 lg:p-8 xl:p-12 animate-fade-in-up space-y-6">
+    <div class="w-full max-w-[1920px] mx-auto p-4 md:p-6 lg:p-8 xl:p-12 animate-fade-in-up flex flex-col gap-8">
       <!-- 상태 카드 섹션 -->
       <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 xl:gap-6">
         <!-- 출퇴근 활성화 토글 -->
-        <div class="card bg-base-100 shadow-xl transition-colors">
+        <div class="card bg-neutral shadow-lg transition-colors border border-white/10 rounded-2xl">
           <div class="card-body p-6 flex flex-row items-center justify-between">
             <div>
               <h3 class="stat-title text-base-content/60 text-sm font-medium mb-1">자동 출퇴근</h3>
@@ -52,19 +52,19 @@
                   v-model="isActive"
                   @change="updateUserStatus"
                 />
-                <span class="font-bold text-lg" :class="isActive ? 'text-primary' : 'text-base-content/40'">
+                <span class="font-bold text-lg" :class="isActive ? 'text-white' : 'text-base-content/40'">
                   {{ isActive ? 'ON' : 'OFF' }}
                 </span>
               </div>
             </div>
-            <div class="p-3 rounded-full bg-primary/10 text-primary">
+            <div class="p-3 rounded-full bg-primary/10 text-white">
               <svg xmlns="http://www.w3.org/2000/svg" class="w-6 h-6" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" /></svg>
             </div>
           </div>
         </div>
 
         <!-- 서버 상태 -->
-        <div class="card bg-base-100 shadow-xl">
+        <div class="card bg-neutral shadow-lg border border-white/10 rounded-2xl">
           <div class="card-body p-6 flex flex-row items-center justify-between">
             <div>
               <h3 class="stat-title text-base-content/60 text-sm font-medium mb-1">서버 상태</h3>
@@ -80,7 +80,7 @@
         </div>
 
         <!-- 오늘 출근 -->
-        <div class="card bg-base-100 shadow-xl">
+        <div class="card bg-neutral shadow-lg border border-white/10 rounded-2xl">
           <div class="card-body p-6 flex flex-row items-center justify-between">
             <div>
               <h3 class="stat-title text-base-content/60 text-sm font-medium mb-1">오늘 출근</h3>
@@ -95,7 +95,7 @@
         </div>
 
         <!-- 오늘 퇴근 -->
-        <div class="card bg-base-100 shadow-xl">
+        <div class="card bg-neutral shadow-lg border border-white/10 rounded-2xl">
           <div class="card-body p-6 flex flex-row items-center justify-between">
             <div>
               <h3 class="stat-title text-base-content/60 text-sm font-medium mb-1">오늘 퇴근</h3>
@@ -111,11 +111,11 @@
       </div>
 
       <!-- 메인 콘텐츠: 로그와 달력 -->
-      <div class="grid grid-cols-1 lg:grid-cols-12 gap-6 xl:gap-8 h-auto lg:h-[calc(100vh-20rem)] min-h-[600px]">
-        <!-- 왼쪽: 로그 (모바일: 전체, 데스크톱: 4/12) -->
-        <div class="lg:col-span-5 xl:col-span-4 flex flex-col h-full">
-          <div class="card bg-base-100 shadow-xl h-full flex flex-col">
-            <div class="card-body p-0 flex flex-col h-full">
+      <div class="grid grid-cols-1 lg:grid-cols-12 gap-6 xl:gap-8 items-start">
+        <!-- 왼쪽: 로그 (모바일: 전체, 데스크톱: 5/12) -->
+        <div class="lg:col-span-5 xl:col-span-4">
+          <div class="card bg-neutral shadow-lg border border-white/10 rounded-2xl overflow-hidden">
+            <div class="card-body p-0">
               <div class="p-4 border-b border-base-content/5 flex justify-between items-center bg-base-200/30 rounded-t-xl">
                 <h3 class="font-bold text-lg flex items-center gap-2">
                   <svg xmlns="http://www.w3.org/2000/svg" class="w-5 h-5 text-primary" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" /></svg>
@@ -126,7 +126,7 @@
               <!-- LOGS TABLE PART ALREADY HANDLED -->
 
 
-              <div class="flex-1 overflow-y-auto min-h-0 scrollbar-thin scrollbar-thumb-base-300 scrollbar-track-base-100">
+              <div class="overflow-y-auto max-h-[400px] lg:max-h-[500px] scrollbar-thin scrollbar-thumb-base-300 scrollbar-track-base-100">
                 <table class="table table-pin-rows table-fixed w-full">
                   <thead>
                     <tr class="bg-base-200/50 text-base-content/70">
@@ -165,13 +165,13 @@
         </div>
 
         <!-- 오른쪽: 달력 (모바일: 전체, 데스크톱: 8/12) -->
-        <div class="lg:col-span-7 xl:col-span-8 h-full">
-          <div class="card bg-base-100 shadow-xl h-full flex flex-col">
-            <div class="card-body p-4 sm:p-6 flex flex-col h-full">
+        <div class="lg:col-span-7 xl:col-span-8">
+          <div class="card bg-neutral shadow-lg border border-white/10 rounded-2xl overflow-hidden">
+            <div class="card-body p-4 sm:p-6">
               <div class="flex flex-col sm:flex-row justify-between items-center mb-6 gap-4">
                 <h3 class="font-bold text-xl flex items-center gap-2">
                   <svg xmlns="http://www.w3.org/2000/svg" class="w-6 h-6 text-secondary" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" /></svg>
-                  <span class="bg-clip-text text-transparent bg-gradient-to-r from-primary to-secondary font-extrabold">
+                  <span class="text-white font-extrabold">
                     {{ currentYear }}년 {{ currentMonth }}월
                   </span>
                 </h3>
@@ -187,21 +187,21 @@
               </div>
 
               <!-- 달력 그리드 -->
-              <div class="grid grid-cols-7 gap-px bg-base-300 rounded-lg overflow-hidden border border-base-300 flex-1">
+              <div class="grid grid-cols-7 gap-[1px] bg-white/5 rounded-xl overflow-hidden border border-white/10">
                 <!-- 요일 헤더 -->
                 <div v-for="(day, index) in weekDays" :key="day"
-                     class="bg-base-200 p-2 text-center text-xs font-bold uppercase tracking-wider flex items-center justify-center"
-                     :class="{'text-error': index === 0, 'text-info': index === 6}">
+                     class="bg-base-300 p-2 sm:p-3 text-center text-xs font-bold uppercase tracking-wider flex items-center justify-center text-white/70"
+                     :class="{'!text-error': index === 0, '!text-info': index === 6}">
                   {{ day }}
                 </div>
 
                 <!-- 날짜 셀 -->
                 <div v-for="(date, index) in calendarDays" :key="index"
                      @click="date.isCurrentMonth && handleDateClick(date)"
-                     class="bg-base-100 p-1 sm:p-2 relative transition-all duration-200 group flex flex-col min-h-[80px] sm:min-h-[100px]"
+                     class="bg-base-200 p-1 sm:p-2 relative transition-all duration-200 group flex flex-col min-h-[80px] sm:min-h-[100px]"
                      :class="{
-                       'bg-base-200/30 text-base-content/30': !date.isCurrentMonth,
-                       'hover:bg-base-200/50 cursor-pointer': date.isCurrentMonth,
+                       'bg-base-300/50 text-base-content/25': !date.isCurrentMonth,
+                       'hover:bg-base-content/10 cursor-pointer': date.isCurrentMonth,
                        'cursor-default': !date.isCurrentMonth
                      }">
 
@@ -220,11 +220,11 @@
 
                   <!-- 스케줄 텍스트 표시 -->
                    <div v-if="date.isCurrentMonth && date.status" class="mt-1 sm:mt-2 flex-1 flex flex-col justify-end">
-                      <div class="text-[10px] sm:text-xs truncate font-medium text-center rounded px-1 py-0.5"
+                      <div class="text-[10px] sm:text-xs truncate font-semibold text-center rounded-md px-1.5 py-1"
                            :class="{
-                             'bg-primary/10 text-primary': date.status.includes('출근'),
-                             'bg-base-200 text-base-content/60': date.status.includes('휴무'),
-                             'bg-secondary/10 text-secondary': !date.status.includes('출근') && !date.status.includes('휴무') && date.status
+                             'bg-primary/20 text-primary-content border border-primary/30': date.status.includes('출근'),
+                             'bg-base-300 text-base-content/50 border border-base-content/10': date.status.includes('휴무'),
+                             'bg-secondary/20 text-secondary border border-secondary/30': !date.status.includes('출근') && !date.status.includes('휴무') && date.status
                            }">
                         {{ date.status }}
                       </div>
@@ -551,42 +551,66 @@
         </div>
       </div>
     </div>
-    <!-- 날짜 선택 모달 (출근/휴무 지정) -->
-    <div v-if="showScheduleModal" class="modal modal-open">
-      <div class="modal-box max-w-sm">
-        <h3 class="font-bold text-lg text-center mb-6">
-          {{ selectedDateInfo.date }}<br>
-          <span class="text-sm font-normal text-base-content/60">근무 형태를 선택해주세요</span>
-        </h3>
+    <!-- 날짜 선택 모달 (출근/휴무 지정) - Redesigned -->
+    <div v-if="showScheduleModal" class="modal modal-open bg-black/40 backdrop-blur-sm transition-all duration-300">
+      <div class="modal-box max-w-md bg-base-100/95 backdrop-blur-xl border border-base-content/10 shadow-2xl p-0 overflow-hidden transform transition-all scale-100">
+        <!-- 헤더 섹션 -->
+        <div class="bg-base-200/50 p-6 border-b border-base-content/5 text-center relative">
+          <button @click="showScheduleModal = false" class="btn btn-sm btn-circle btn-ghost absolute right-4 top-4">✕</button>
 
-        <div class="grid grid-cols-2 gap-4">
+          <h3 class="font-extrabold text-2xl mb-1 text-white inline-block">
+            {{ selectedDateInfo.dateStr }}
+          </h3>
+          <p class="text-sm font-medium text-base-content/60">
+            {{ selectedDateInfo.isWorkday ? '현재: 정상 근무일 🏢' : '현재: 휴무일 🏠' }}
+          </p>
+        </div>
+
+        <!-- 선택 카드 섹션 -->
+        <div class="p-6 grid grid-cols-2 gap-4">
+          <!-- 근무 카드 -->
           <button
             @click="updateSchedule('work')"
-            class="btn h-24 flex-col gap-2"
-            :class="selectedDateInfo.isWorkday ? 'btn-primary' : 'btn-outline border-base-content/20 hover:border-primary hover:text-primary hover:bg-primary/10'"
+            class="group relative flex flex-col items-center justify-center p-6 rounded-2xl border-2 transition-all duration-200 hover:scale-[1.02] active:scale-95"
+            :class="selectedDateInfo.isWorkday
+              ? 'bg-primary/5 border-primary shadow-lg shadow-primary/10'
+              : 'bg-base-100 border-base-200 hover:border-primary/50 hover:bg-primary/5'"
           >
-            <div class="p-3 rounded-full bg-primary/10 text-primary mb-1">
-              <svg xmlns="http://www.w3.org/2000/svg" class="w-6 h-6" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 13.255A23.931 23.931 0 0112 15c-3.183 0-6.22-.62-9-1.745M16 6V4a2 2 0 00-2-2h-4a2 2 0 00-2 2v2m4 6h.01M5 20h14a2 2 0 002-2V8a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z" /></svg>
+            <div class="w-14 h-14 rounded-full flex items-center justify-center mb-3 transition-colors"
+                 :class="selectedDateInfo.isWorkday ? 'bg-primary text-white' : 'bg-base-200 text-white group-hover:bg-primary group-hover:text-white'">
+              <svg xmlns="http://www.w3.org/2000/svg" class="w-7 h-7" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 13.255A23.931 23.931 0 0112 15c-3.183 0-6.22-.62-9-1.745M16 6V4a2 2 0 00-2-2h-4a2 2 0 00-2 2v2m4 6h.01M5 20h14a2 2 0 002-2V8a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z" /></svg>
             </div>
-            <span class="text-lg">출근</span>
-            <span v-if="selectedDateInfo.isWorkday" class="badge badge-sm badge-primary">현재 상태</span>
+            <span class="font-bold text-lg mb-1" :class="selectedDateInfo.isWorkday ? 'text-primary' : 'text-white'">출근</span>
+            <span class="text-xs text-white/50 text-center">정상 근무일로<br>설정합니다</span>
+
+            <div v-if="selectedDateInfo.isWorkday" class="absolute top-3 right-3 text-primary">
+              <svg xmlns="http://www.w3.org/2000/svg" class="w-5 h-5" viewBox="0 0 20 20" fill="currentColor"><path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clip-rule="evenodd" /></svg>
+            </div>
           </button>
 
+          <!-- 휴무 카드 -->
           <button
             @click="updateSchedule('rest')"
-            class="btn h-24 flex-col gap-2"
-            :class="!selectedDateInfo.isWorkday ? 'btn-secondary' : 'btn-outline border-base-content/20 hover:border-secondary hover:text-secondary hover:bg-secondary/10'"
+            class="group relative flex flex-col items-center justify-center p-6 rounded-2xl border-2 transition-all duration-200 hover:scale-[1.02] active:scale-95"
+            :class="!selectedDateInfo.isWorkday
+              ? 'bg-secondary/5 border-secondary shadow-lg shadow-secondary/10'
+              : 'bg-base-100 border-base-200 hover:border-secondary/50 hover:bg-secondary/5'"
           >
-            <div class="p-3 rounded-full bg-secondary/10 text-secondary mb-1">
-              <svg xmlns="http://www.w3.org/2000/svg" class="w-6 h-6" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M20.354 15.354A9 9 0 018.646 3.646 9.003 9.003 0 0012 21a9.003 9.003 0 008.354-5.646z" /></svg>
+            <div class="w-14 h-14 rounded-full flex items-center justify-center mb-3 transition-colors"
+                 :class="!selectedDateInfo.isWorkday ? 'bg-secondary text-white' : 'bg-base-200 text-white group-hover:bg-secondary group-hover:text-white'">
+              <svg xmlns="http://www.w3.org/2000/svg" class="w-7 h-7" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M20.354 15.354A9 9 0 018.646 3.646 9.003 9.003 0 0012 21a9.003 9.003 0 008.354-5.646z" /></svg>
             </div>
-            <span class="text-lg">휴무</span>
-            <span v-if="!selectedDateInfo.isWorkday" class="badge badge-sm badge-secondary">현재 상태</span>
+            <span class="font-bold text-lg mb-1" :class="!selectedDateInfo.isWorkday ? 'text-secondary' : 'text-white'">휴무</span>
+            <span class="text-xs text-white/50 text-center">휴무일로<br>설정합니다</span>
+
+            <div v-if="!selectedDateInfo.isWorkday" class="absolute top-3 right-3 text-secondary">
+              <svg xmlns="http://www.w3.org/2000/svg" class="w-5 h-5" viewBox="0 0 20 20" fill="currentColor"><path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clip-rule="evenodd" /></svg>
+            </div>
           </button>
         </div>
 
-        <div class="modal-action">
-          <button @click="showScheduleModal = false" class="btn btn-ghost btn-block">
+        <div class="p-4 pt-0">
+          <button @click="showScheduleModal = false" class="btn btn-ghost btn-block btn-sm text-base-content/50 hover:text-base-content">
             취소
           </button>
         </div>
