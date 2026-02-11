@@ -197,7 +197,7 @@
 
                 <!-- 날짜 셀 -->
                 <div v-for="(date, index) in calendarDays" :key="index"
-                     @click="date.isCurrentMonth && toggleDateSchedule(date.day)"
+                     @click="date.isCurrentMonth && handleDateClick(date)"
                      class="bg-base-100 p-1 sm:p-2 relative transition-all duration-200 group flex flex-col min-h-[80px] sm:min-h-[100px]"
                      :class="{
                        'bg-base-200/30 text-base-content/30': !date.isCurrentMonth,
@@ -551,6 +551,47 @@
         </div>
       </div>
     </div>
+    <!-- 날짜 선택 모달 (출근/휴무 지정) -->
+    <div v-if="showScheduleModal" class="modal modal-open">
+      <div class="modal-box max-w-sm">
+        <h3 class="font-bold text-lg text-center mb-6">
+          {{ selectedDateInfo.date }}<br>
+          <span class="text-sm font-normal text-base-content/60">근무 형태를 선택해주세요</span>
+        </h3>
+
+        <div class="grid grid-cols-2 gap-4">
+          <button
+            @click="updateSchedule('work')"
+            class="btn h-24 flex-col gap-2"
+            :class="selectedDateInfo.isWorkday ? 'btn-primary' : 'btn-outline border-base-content/20 hover:border-primary hover:text-primary hover:bg-primary/10'"
+          >
+            <div class="p-3 rounded-full bg-primary/10 text-primary mb-1">
+              <svg xmlns="http://www.w3.org/2000/svg" class="w-6 h-6" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 13.255A23.931 23.931 0 0112 15c-3.183 0-6.22-.62-9-1.745M16 6V4a2 2 0 00-2-2h-4a2 2 0 00-2 2v2m4 6h.01M5 20h14a2 2 0 002-2V8a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z" /></svg>
+            </div>
+            <span class="text-lg">출근</span>
+            <span v-if="selectedDateInfo.isWorkday" class="badge badge-sm badge-primary">현재 상태</span>
+          </button>
+
+          <button
+            @click="updateSchedule('rest')"
+            class="btn h-24 flex-col gap-2"
+            :class="!selectedDateInfo.isWorkday ? 'btn-secondary' : 'btn-outline border-base-content/20 hover:border-secondary hover:text-secondary hover:bg-secondary/10'"
+          >
+            <div class="p-3 rounded-full bg-secondary/10 text-secondary mb-1">
+              <svg xmlns="http://www.w3.org/2000/svg" class="w-6 h-6" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M20.354 15.354A9 9 0 018.646 3.646 9.003 9.003 0 0012 21a9.003 9.003 0 008.354-5.646z" /></svg>
+            </div>
+            <span class="text-lg">휴무</span>
+            <span v-if="!selectedDateInfo.isWorkday" class="badge badge-sm badge-secondary">현재 상태</span>
+          </button>
+        </div>
+
+        <div class="modal-action">
+          <button @click="showScheduleModal = false" class="btn btn-ghost btn-block">
+            취소
+          </button>
+        </div>
+      </div>
+    </div>
   </div>
 </template>
 
@@ -615,6 +656,16 @@ const isActive = ref(false)
 const showDeleteModal = ref(false)
 const deleteConfirmed = ref(false)
 const isDeleting = ref(false)
+
+// 날짜 선택 모달 관련
+const showScheduleModal = ref(false)
+const selectedDateInfo = ref({
+  date: '',
+  dateStr: '',
+  status: '',
+  isWorkday: false,
+  day: 0
+})
 
 // 비밀번호 변경 관련
 const showPasswordModal = ref(false)
@@ -1357,6 +1408,39 @@ const getDateScheduleText = (date: number) => {
     return isWeekend ? '휴무' : '출근'
   }
   return schedule.is_workday ? '출근' : '휴무'
+}
+
+const handleDateClick = (dateInfo: any) => {
+  if (!dateInfo.isCurrentMonth) return
+
+  const dateStr = dateInfo.dateStr
+  const status = getDateScheduleText(dateInfo.day)
+  const isWorkday = status === '출근'
+
+  selectedDateInfo.value = {
+    date: `${currentYear.value}년 ${currentMonth.value}월 ${dateInfo.day}일`,
+    dateStr: dateStr,
+    status: status,
+    isWorkday: isWorkday,
+    day: dateInfo.day
+  }
+
+  showScheduleModal.value = true
+}
+
+const updateSchedule = async (type: 'work' | 'rest') => {
+  const targetIsWorkday = type === 'work'
+
+  // 현재 상태와 같으면 변경하지 않음 (선택은 했으니 모달은 닫음)
+  if (selectedDateInfo.value.isWorkday === targetIsWorkday) {
+    showScheduleModal.value = false
+    return
+  }
+
+  // 상태가 다르면 토글 실행
+  // API가 토글형식이라 현재 상태의 반대로 요청하면 원하는 상태가 됨
+  await toggleDateSchedule(selectedDateInfo.value.day)
+  showScheduleModal.value = false
 }
 
 const toggleDateSchedule = async (date: number) => {
