@@ -16,7 +16,7 @@
         <h1 class="text-3xl font-bold bg-clip-text text-transparent bg-gradient-to-r from-primary to-secondary mb-2">
           귀찮은 출퇴근
         </h1>
-        <p class="text-base-content/60 font-medium">더 이상 수동으로 찍지 마세요</p>
+        <p class="text-base-content/60 font-medium"> <br> </p>
       </div>
 
       <!-- 로그인 카드 -->
