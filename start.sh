@@ -306,9 +306,11 @@ case "${1:-restart}" in
         start_server
         ;;
     "stop")
+        create_log_dirs
         stop_server
         ;;
     "restart")
+        create_log_dirs
         echo "🔄 서버를 재시작합니다..."
         log_message "INFO" "서버 재시작 요청"
         start_server
