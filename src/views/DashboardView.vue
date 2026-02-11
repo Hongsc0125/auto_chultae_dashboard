@@ -130,7 +130,7 @@
                 <table class="table table-pin-rows table-fixed w-full">
                   <thead>
                     <tr class="bg-base-200/50 text-base-content/70">
-                      <th class="w-20 text-center">시간</th>
+                      <th class="w-32 text-center">시간</th>
                       <th class="w-24 text-center">상태</th>
                       <th class="w-auto">메시지</th>
                     </tr>
@@ -605,7 +605,9 @@ const todayStatus = ref({
 })
 
 const logs = ref<any[]>([])
-const reversedLogs = computed(() => [...logs.value].reverse())
+const reversedLogs = computed(() => {
+  return [...logs.value].sort((a, b) => new Date(b.timestamp).getTime() - new Date(a.timestamp).getTime())
+})
 const selectedLog = ref<any>(null)
 const detailLogs = ref<any[]>([])
 const isLoadingHeartbeat = ref(false)
@@ -891,7 +893,15 @@ const translateMessage = (message: string) => {
 const formatTime = (timestamp: string) => {
   if (!timestamp) return '-'
   const date = new Date(timestamp)
-  return isNaN(date.getTime()) ? '-' : date.toLocaleTimeString('ko-KR')
+  if (isNaN(date.getTime())) return '-'
+
+  const month = String(date.getMonth() + 1).padStart(2, '0')
+  const day = String(date.getDate()).padStart(2, '0')
+  const hours = String(date.getHours()).padStart(2, '0')
+  const minutes = String(date.getMinutes()).padStart(2, '0')
+  const seconds = String(date.getSeconds()).padStart(2, '0')
+
+  return `${month}-${day} ${hours}:${minutes}:${seconds}`
 }
 
 
