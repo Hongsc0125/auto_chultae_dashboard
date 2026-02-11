@@ -3,6 +3,8 @@
 # Auto Chultae Dashboard 서버 관리 스크립트
 # Usage: ./start.sh [start|stop|restart|status|logs]
 
+cd "$(dirname "$0")"
+
 PROJECT_NAME="auto_chultae_dashboard"
 PORT=6500
 PID_FILE="$PWD/.${PROJECT_NAME}.pid"
