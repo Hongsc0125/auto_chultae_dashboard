@@ -1089,15 +1089,14 @@ const formatTime = (timestamp: string) => {
 const showDetailModal = async (log: any) => {
   selectedLog.value = log
 
-  // 더미 데이터 생성 (시각적 확인용)
   // 더미 데이터 생성 (시각적 확인용) - 로컬 개발 환경에서만 동작
   if (!log.details || log.details.length === 0) {
-    try {
-      const { getDummyLogs } = await import('@/utils/logDummyData')
-      detailLogs.value = getDummyLogs(log.timestamp)
-    } catch {
-      // 배포 환경이나 해당 파일이 없을 경우 더미 데이터 없이 빈 배열 사용
-      console.debug('Dummy data not available')
+    const dummyModules = import.meta.glob('@/utils/logDummyData.ts')
+    const loader = dummyModules['/src/utils/logDummyData.ts']
+    if (loader) {
+      const mod = await loader() as { getDummyLogs: (timestamp: string) => any[] }
+      detailLogs.value = mod.getDummyLogs(log.timestamp)
+    } else {
       detailLogs.value = []
     }
   } else {
