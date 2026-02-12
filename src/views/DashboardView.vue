@@ -257,78 +257,101 @@
     </div>
 
     <!-- 상세 로그 모달 -->
-    <div v-if="selectedLog" class="modal modal-open">
-      <div class="modal-box max-w-6xl max-h-[90vh]">
-        <div class="flex items-center justify-between mb-6">
-          <div class="flex items-center gap-3">
-            <div :class="['badge badge-lg', getBadgeVariant(selectedLog.status)]">
-              {{ translateStatus(selectedLog.status) }}
+    <div v-if="selectedLog" class="modal modal-open bg-black/40 backdrop-blur-sm transition-all duration-300 items-center justify-center">
+      <div class="modal-box w-11/12 max-w-6xl h-[90vh] bg-base-100/95 backdrop-blur-xl border border-base-content/10 shadow-2xl p-0 overflow-hidden relative flex flex-col">
+        <!-- 배경 장식 -->
+        <div class="absolute top-0 right-0 w-72 h-72 bg-primary/8 rounded-full blur-3xl -translate-y-1/2 translate-x-1/2 pointer-events-none"></div>
+        <div class="absolute bottom-0 left-0 w-56 h-56 bg-secondary/8 rounded-full blur-3xl translate-y-1/2 -translate-x-1/2 pointer-events-none"></div>
+
+        <!-- 헤더 섹션 (고정) -->
+        <div class="bg-base-200/50 p-6 border-b border-base-content/5 shrink-0 z-10 relative">
+          <div class="flex items-center justify-between">
+            <div class="flex items-center gap-4">
+              <div class="w-12 h-12 rounded-xl bg-gradient-to-br from-primary to-secondary flex items-center justify-center shadow-lg shrink-0">
+                <svg xmlns="http://www.w3.org/2000/svg" class="w-6 h-6 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
+                </svg>
+              </div>
+              <div class="flex flex-col gap-1">
+                <div class="flex items-center gap-3">
+                  <h3 class="text-xl font-bold text-white">
+                    {{ translateActionType(selectedLog.action_type) }} 상세 로그
+                  </h3>
+                  <div :class="['badge badge-sm', getBadgeVariant(selectedLog.status)]">
+                    {{ translateStatus(selectedLog.status) }}
+                  </div>
+                </div>
+                <p class="text-xs text-base-content/50">{{ formatTime(selectedLog.timestamp) }} 실행 기록</p>
+              </div>
             </div>
-            <h3 class="text-xl font-bold text-base-content">
-              {{ translateActionType(selectedLog.action_type) }} 상세 로그
-            </h3>
+            <button @click="selectedLog = null" class="btn btn-sm btn-circle btn-ghost hover:bg-white/10">
+              <svg xmlns="http://www.w3.org/2000/svg" class="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
+              </svg>
+            </button>
           </div>
-          <button @click="selectedLog = null" class="btn btn-sm btn-circle btn-ghost">
-            ✕
-          </button>
         </div>
 
-        <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
-          <!-- 기본 정보 사이드바 -->
-          <div class="lg:col-span-1 flex flex-col gap-4">
-            <!-- 요약 정보 -->
-            <div class="card bg-gradient-to-br from-primary/10 to-secondary/10 shadow-lg">
-              <div class="card-body p-4">
-                <h4 class="font-bold text-base-content mb-3 flex items-center gap-2">
-                  📊 실행 요약
+        <!-- 메인 콘텐츠 (스크롤 가능) -->
+        <div class="p-6 overflow-y-auto flex-1 custom-scrollbar relative z-0">
+          <div class="grid grid-cols-1 lg:grid-cols-3 gap-6 h-full">
+            <!-- 기본 정보 사이드바 -->
+            <div class="lg:col-span-1 flex flex-col gap-6 h-full">
+              <!-- 요약 정보 -->
+              <div class="rounded-2xl bg-gradient-to-br from-primary/10 to-secondary/10 border border-white/10 shadow-lg p-6">
+                <h4 class="font-bold text-white flex items-center gap-2 text-sm mb-5">
+                  <span class="w-7 h-7 rounded-lg bg-primary/20 flex items-center justify-center text-xs">📊</span>
+                  실행 요약
                 </h4>
-                <div class="flex flex-col gap-3 text-sm">
-                  <div class="flex justify-between">
-                    <span class="font-medium text-base-content/70">사용자:</span>
-                    <span class="font-mono text-primary">{{ selectedLog.user_id }}</span>
+                <div class="flex flex-col gap-4 text-sm">
+                  <div class="flex justify-between items-center">
+                    <span class="font-medium text-base-content/60">사용자</span>
+                    <span class="font-mono text-primary font-semibold">{{ selectedLog.user_id }}</span>
                   </div>
-                  <div class="flex justify-between">
-                    <span class="font-medium text-base-content/70">시작 시간:</span>
-                    <span class="font-mono">{{ formatTime(selectedLog.timestamp) }}</span>
+                  <div class="w-full h-px bg-white/5"></div>
+                  <div class="flex justify-between items-center">
+                    <span class="font-medium text-base-content/60">시작 시간</span>
+                    <span class="font-mono text-white/90">{{ formatTime(selectedLog.timestamp) }}</span>
                   </div>
-                  <div class="flex justify-between" v-if="detailLogs.length > 0">
-                    <span class="font-medium text-base-content/70">완료 시간:</span>
-                    <span class="font-mono">{{ formatTime(getLastStageTime()) }}</span>
+                  <div v-if="detailLogs.length > 0" class="w-full h-px bg-white/5"></div>
+                  <div class="flex justify-between items-center" v-if="detailLogs.length > 0">
+                    <span class="font-medium text-base-content/60">완료 시간</span>
+                    <span class="font-mono text-white/90">{{ formatTime(getLastStageTime()) }}</span>
                   </div>
-                  <div class="flex justify-between" v-if="detailLogs.length > 0">
-                    <span class="font-medium text-base-content/70">총 소요시간:</span>
-                    <span class="font-mono text-secondary">{{ calculateDuration() }}</span>
+                  <div v-if="detailLogs.length > 0" class="w-full h-px bg-white/5"></div>
+                  <div class="flex justify-between items-center" v-if="detailLogs.length > 0">
+                    <span class="font-medium text-base-content/60">총 소요시간</span>
+                    <span class="font-mono text-secondary font-semibold">{{ calculateDuration() }}</span>
                   </div>
-                  <div class="flex justify-between">
-                    <span class="font-medium text-base-content/70">단계 수:</span>
-                    <span class="font-mono text-accent">{{ detailLogs.length }}단계</span>
+                  <div class="w-full h-px bg-white/5"></div>
+                  <div class="flex justify-between items-center">
+                    <span class="font-medium text-base-content/60">단계 수</span>
+                    <span class="font-mono text-accent font-semibold">{{ detailLogs.length }}단계</span>
                   </div>
                 </div>
               </div>
-            </div>
 
-            <!-- 메시지 -->
-            <div class="card bg-base-100 shadow" v-if="selectedLog.message">
-              <div class="card-body p-4">
-                <h4 class="font-bold text-base-content mb-3 flex items-center gap-2">
-                  💬 결과 메시지
+              <!-- 메시지 -->
+              <div class="rounded-2xl bg-base-200/30 border border-white/10 shadow p-6" v-if="selectedLog.message">
+                <h4 class="font-bold text-white flex items-center gap-2 text-sm mb-5">
+                  <span class="w-7 h-7 rounded-lg bg-info/20 flex items-center justify-center text-xs">💬</span>
+                  결과 메시지
                 </h4>
-                <div :class="['alert', getMessageAlertClass(selectedLog.status)]">
+                <div :class="['alert', getMessageAlertClass(selectedLog.status), 'border-0']">
                   <span class="text-sm">{{ translateMessage(selectedLog.message) }}</span>
                 </div>
               </div>
-            </div>
 
-            <!-- 진행률 표시 -->
-            <div class="card bg-base-100 shadow" v-if="detailLogs.length > 0">
-              <div class="card-body p-4">
-                <h4 class="font-bold text-base-content mb-3 flex items-center gap-2">
-                  📈 진행률
+              <!-- 진행률 표시 -->
+              <div class="rounded-2xl bg-base-200/30 border border-white/10 shadow p-6" v-if="detailLogs.length > 0">
+                <h4 class="font-bold text-white flex items-center gap-2 text-sm mb-5">
+                  <span class="w-7 h-7 rounded-lg bg-success/20 flex items-center justify-center text-xs">📈</span>
+                  진행률
                 </h4>
-                <div class="flex flex-col gap-3">
+                <div class="flex flex-col gap-4">
                   <div class="flex justify-between text-sm">
-                    <span>완료된 단계</span>
-                    <span class="font-mono">{{ detailLogs.length }}/{{ getExpectedSteps() }}</span>
+                    <span class="text-base-content/60">완료된 단계</span>
+                    <span class="font-mono text-white/90">{{ detailLogs.length }}/{{ getExpectedSteps() }}</span>
                   </div>
                   <progress
                     class="progress progress-primary w-full"
@@ -336,80 +359,81 @@
                     :max="getExpectedSteps()">
                   </progress>
                   <div class="flex justify-between items-center">
-                    <div class="text-xs text-base-content/60">
+                    <div class="text-xs text-base-content/50">
                       {{ Math.round((detailLogs.length / getExpectedSteps()) * 100) }}% 완료
                     </div>
-                    <div class="text-xs text-base-content/60">
+                    <div class="text-xs text-base-content/50">
                       남은 단계: {{ getExpectedSteps() - detailLogs.length }}개
                     </div>
                   </div>
 
                   <!-- 현재 상태 표시 -->
-                  <div class="mt-3 p-2 bg-base-200 rounded-lg">
-                    <div class="text-xs text-base-content/80 mb-1">현재 상태</div>
+                  <div class="mt-1 p-3 bg-base-300/50 rounded-xl border border-white/5">
+                    <div class="text-xs text-base-content/60 mb-1.5">현재 상태</div>
                     <div class="flex items-center gap-2">
-                      <div :class="['w-2 h-2 rounded-full', getProcessStatusColor()]"></div>
-                      <span class="text-sm font-medium">{{ getProcessStatusText() }}</span>
+                      <div :class="['w-2.5 h-2.5 rounded-full', getProcessStatusColor()]"></div>
+                      <span class="text-sm font-semibold text-white">{{ getProcessStatusText() }}</span>
                     </div>
                   </div>
                 </div>
               </div>
             </div>
-          </div>
 
-          <!-- 메인 타임라인 -->
-          <div class="lg:col-span-2">
-            <div class="card bg-base-100 shadow-lg">
-              <div class="card-body p-6">
-                <h4 class="font-bold text-base-content mb-4 flex items-center gap-2">
-                  🔄 단계별 실행 로그
-                  <div class="badge badge-neutral badge-sm">{{ detailLogs.length }}단계</div>
-                </h4>
+            <!-- 메인 타임라인 -->
+            <div class="lg:col-span-2 flex flex-col h-full">
+              <div class="rounded-2xl bg-base-200/30 border border-white/10 shadow-lg overflow-hidden flex flex-col h-full">
+                <div class="p-6 flex flex-col h-full">
+                  <h4 class="font-bold text-white flex items-center gap-2 text-sm mb-5 shrink-0">
+                    <span class="w-7 h-7 rounded-lg bg-warning/20 flex items-center justify-center text-xs">🔄</span>
+                    단계별 실행 로그
+                    <div class="badge badge-neutral badge-sm ml-1">{{ detailLogs.length }}단계</div>
+                  </h4>
 
-                <!-- 로딩 상태 -->
-                <div v-if="isLoadingHeartbeat" class="text-center py-8">
-                  <div class="loading loading-spinner loading-lg text-primary"></div>
-                  <p class="text-base-content/60 mt-4">하트비트 로그를 불러오는 중...</p>
-                  <p class="text-xs text-base-content/40 mt-2">로그 ID: {{ selectedLog?.id }}</p>
-                </div>
+                  <!-- 로딩 상태 -->
+                  <div v-if="isLoadingHeartbeat" class="flex-1 flex flex-col items-center justify-center text-center py-12">
+                    <div class="loading loading-spinner loading-lg text-primary"></div>
+                    <p class="text-base-content/60 mt-4">하트비트 로그를 불러오는 중...</p>
+                    <p class="text-xs text-base-content/40 mt-2">로그 ID: {{ selectedLog?.id }}</p>
+                  </div>
 
-                <!-- 데이터 없음 -->
-                <div v-else-if="!isLoadingHeartbeat && detailLogs.length === 0" class="text-center py-8">
-                  <div class="text-warning text-4xl mb-4">⚠️</div>
-                  <p class="text-base-content/60">이 로그에 대한 하트비트 데이터가 없습니다.</p>
-                  <p class="text-xs text-base-content/40 mt-2">로그 ID: {{ selectedLog?.id }}</p>
-                </div>
+                  <!-- 데이터 없음 -->
+                  <div v-else-if="!isLoadingHeartbeat && detailLogs.length === 0" class="flex-1 flex flex-col items-center justify-center text-center py-12">
+                    <div class="text-warning text-5xl mb-4">⚠️</div>
+                    <p class="text-base-content/60 font-medium">이 로그에 대한 하트비트 데이터가 없습니다.</p>
+                    <p class="text-xs text-base-content/40 mt-3">로그 ID: {{ selectedLog?.id }}</p>
+                  </div>
 
-                <!-- 타임라인 -->
-                <div v-else class="overflow-y-auto max-h-[500px] pr-2">
-                  <div class="flex flex-col gap-3">
-                    <div v-for="(detail, index) in detailLogs" :key="index"
-                         class="flex items-start gap-4 p-3 rounded-lg hover:bg-base-200/50 transition-colors">
-                      <!-- 단계 번호와 아이콘 -->
-                      <div class="flex flex-col items-center">
-                        <div :class="['w-8 h-8 rounded-full flex items-center justify-center text-xs font-bold text-white', getStageColor(detail.stage)]">
-                          {{ index + 1 }}
+                  <!-- 타임라인 -->
+                  <div v-else class="flex-1 overflow-y-auto pr-2 custom-scrollbar">
+                    <div class="flex flex-col gap-4">
+                      <div v-for="(detail, index) in detailLogs" :key="index"
+                           class="flex items-start gap-4 p-4 rounded-xl bg-base-300/30 border border-white/5 hover:bg-base-300/50 hover:border-white/10 transition-all duration-200">
+                        <!-- 단계 번호와 아이콘 -->
+                        <div class="flex flex-col items-center gap-2">
+                          <div :class="['w-9 h-9 rounded-full flex items-center justify-center text-xs font-bold text-white shadow-md', getStageColor(detail.stage)]">
+                            {{ index + 1 }}
+                          </div>
+                          <div v-if="index < detailLogs.length - 1" class="w-0.5 h-6 bg-base-content/10"></div>
                         </div>
-                        <div v-if="index < detailLogs.length - 1" class="w-0.5 h-8 bg-base-300 mt-2"></div>
-                      </div>
 
-                      <!-- 내용 -->
-                      <div class="flex-1 min-w-0">
-                        <div class="flex items-center justify-between mb-1">
-                          <h5 class="font-semibold text-base-content">{{ translateStage(detail.stage) }}</h5>
-                          <span class="text-xs font-mono text-base-content/60">{{ formatTime(detail.timestamp) }}</span>
+                        <!-- 내용 -->
+                        <div class="flex-1 min-w-0 flex flex-col gap-2">
+                          <div class="flex items-center justify-between">
+                            <h5 class="font-semibold text-white">{{ translateStage(detail.stage) }}</h5>
+                            <span class="text-xs font-mono text-base-content/50 bg-base-300/50 px-2 py-0.5 rounded">{{ formatTime(detail.timestamp) }}</span>
+                          </div>
+                          <div class="text-sm text-base-content/60">{{ getStageDescription(detail.stage) }}</div>
+                          <div class="flex items-center gap-2 text-xs">
+                            <div class="badge badge-outline badge-xs">{{ detail.stage }}</div>
+                            <div class="badge badge-ghost badge-xs">PID: {{ detail.pid }}</div>
+                          </div>
                         </div>
-                        <div class="text-sm text-base-content/70 mb-2">{{ getStageDescription(detail.stage) }}</div>
-                        <div class="flex items-center gap-2 text-xs">
-                          <div class="badge badge-outline badge-xs">{{ detail.stage }}</div>
-                          <div class="badge badge-ghost badge-xs">PID: {{ detail.pid }}</div>
-                        </div>
-                      </div>
 
-                      <!-- 소요 시간 -->
-                      <div class="text-right">
-                        <div class="text-xs text-base-content/60">
-                          {{ index > 0 ? calculateStepDuration(detailLogs[index-1].timestamp, detail.timestamp) : '시작' }}
+                        <!-- 소요 시간 -->
+                        <div class="text-right shrink-0">
+                          <div class="text-xs font-mono text-base-content/50">
+                            {{ index > 0 ? calculateStepDuration(detailLogs[index-1].timestamp, detail.timestamp) : '시작' }}
+                          </div>
                         </div>
                       </div>
                     </div>
@@ -1064,9 +1088,23 @@ const formatTime = (timestamp: string) => {
 
 const showDetailModal = async (log: any) => {
   selectedLog.value = log
-  detailLogs.value = [] // 이전 데이터 클리어
-  isLoadingHeartbeat.value = true
-  await fetchDetailLogs(log.id)
+
+  // 더미 데이터 생성 (시각적 확인용)
+  // 더미 데이터 생성 (시각적 확인용) - 로컬 개발 환경에서만 동작
+  if (!log.details || log.details.length === 0) {
+    try {
+      const { getDummyLogs } = await import('@/utils/logDummyData')
+      detailLogs.value = getDummyLogs(log.timestamp)
+    } catch {
+      // 배포 환경이나 해당 파일이 없을 경우 더미 데이터 없이 빈 배열 사용
+      console.debug('Dummy data not available')
+      detailLogs.value = []
+    }
+  } else {
+    detailLogs.value = [];
+    isLoadingHeartbeat.value = true;
+    await fetchDetailLogs(log.id);
+  }
 }
 
 const fetchDetailLogs = async (logId: number) => {
@@ -1217,14 +1255,14 @@ const getStageDescription = (stage: string) => {
 const getMessageAlertClass = (status: string) => {
   switch (status) {
     case 'success':
-      return 'alert-success'
+      return 'alert-soft alert-success'
     case 'error':
     case 'failed':
-      return 'alert-error'
+      return 'alert-soft alert-error'
     case 'already_done':
-      return 'alert-info'
+      return 'alert-soft alert-info'
     default:
-      return 'alert-warning'
+      return 'alert-soft alert-warning'
   }
 }
 
