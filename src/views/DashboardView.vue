@@ -144,8 +144,8 @@
                         </div>
                       </td>
                       <td class="text-xs sm:text-sm leading-relaxed min-w-0 overflow-hidden">
-                        <div class="truncate w-full block" :title="translateMessage(log.message)">
-                          {{ translateMessage(log.message) }}
+                        <div class="truncate w-full block" :title="translateMessage(log.message, log)">
+                          {{ translateMessage(log.message, log) }}
                         </div>
                       </td>
                     </tr>
@@ -332,13 +332,13 @@
               </div>
 
               <!-- 메시지 -->
-              <div class="rounded-2xl bg-base-200/30 border border-white/10 shadow p-6" v-if="selectedLog.message">
+              <div class="rounded-2xl bg-base-200/30 border border-white/10 shadow p-6" v-if="selectedLog.message || selectedLog.status">
                 <h4 class="font-bold text-white flex items-center gap-2 text-sm mb-5">
                   <span class="w-7 h-7 rounded-lg bg-info/20 flex items-center justify-center text-xs">💬</span>
                   결과 메시지
                 </h4>
                 <div :class="['alert', getMessageAlertClass(selectedLog.status), 'border-0']">
-                  <span class="text-sm">{{ translateMessage(selectedLog.message) }}</span>
+                  <span class="text-sm">{{ translateMessage(selectedLog.message, selectedLog) }}</span>
                 </div>
               </div>
 
@@ -1047,7 +1047,16 @@ const translateStatus = (status: string) => {
   return translations[status] || status
 }
 
-const translateMessage = (message: string) => {
+const translateMessage = (message: string, log?: any) => {
+  if (!message && log) {
+    const action = log.action_type === 'punch_in' ? '출근' : log.action_type === 'punch_out' ? '퇴근' : ''
+    const defaults: Record<string, string> = {
+      'success': `${action} 처리가 정상적으로 완료되었습니다.`,
+      'already_done': `${action} 이미 처리된 상태입니다.`,
+      'failed': `${action} 처리 중 오류가 발생했습니다.`,
+    }
+    return defaults[log.status] || ''
+  }
   if (!message) return ''
 
   const translations: Record<string, string> = {
